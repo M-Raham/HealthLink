@@ -1,12 +1,13 @@
 import React from 'react';
 import { Calendar, Search, Stethoscope, FileText } from 'lucide-react';
-import Footer from '../../components/Footer';
+import Footer from '@components/Footer';
+import Navbar from '@components/Navbar';
 
 const HealthLinkDMS: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      
+      <Navbar/>
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-gray-100 to-gray-200 overflow-hidden">
