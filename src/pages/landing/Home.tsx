@@ -1,39 +1,12 @@
 import React from 'react';
-import { Calendar, Search, Stethoscope, FileText, Facebook, Twitter, Linkedin, Youtube } from 'lucide-react';
+import { Calendar, Search, Stethoscope, FileText } from 'lucide-react';
+import Footer from '../../components/Footer';
 
 const HealthLinkDMS: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            {/* Logo */}
-            <div className="flex items-center">
-              <div className="text-blue-600 text-2xl font-bold">
-                ✱ HealthLinkDMS
-              </div>
-            </div>
-            
-            {/* Navigation */}
-            <nav className="hidden md:flex space-x-8">
-              <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Home</a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">About</a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Services</a>
-            </nav>
-            
-            {/* Auth Buttons */}
-            <div className="flex space-x-3">
-              <button className="px-4 py-2 text-gray-700 hover:text-blue-600 font-medium">
-                Login
-              </button>
-              <button className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
-                Sign Up
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-gray-100 to-gray-200 overflow-hidden">
@@ -131,62 +104,7 @@ const HealthLinkDMS: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-blue-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Company Info */}
-            <div className="md:col-span-1">
-              <h3 className="text-lg font-semibold mb-4">
-                Streamlining hospital operations for better patient care.
-              </h3>
-              <div className="flex space-x-4">
-                <Facebook className="w-5 h-5 hover:text-blue-200 cursor-pointer" />
-                <Twitter className="w-5 h-5 hover:text-blue-200 cursor-pointer" />
-                <Linkedin className="w-5 h-5 hover:text-blue-200 cursor-pointer" />
-                <Youtube className="w-5 h-5 hover:text-blue-200 cursor-pointer" />
-              </div>
-            </div>
-
-            {/* Company Links */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Company</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="hover:text-blue-200">About Us</a></li>
-                <li><a href="#" className="hover:text-blue-200">Careers</a></li>
-                <li><a href="#" className="hover:text-blue-200">Blog</a></li>
-              </ul>
-            </div>
-
-            {/* Support Links */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Support</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="hover:text-blue-200">Contact Us</a></li>
-                <li><a href="#" className="hover:text-blue-200">FAQ</a></li>
-                <li><a href="#" className="hover:text-blue-200">Help Center</a></li>
-              </ul>
-            </div>
-
-            {/* Legal Links */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="hover:text-blue-200">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-blue-200">Privacy Policy</a></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Footer */}
-          <div className="border-t border-blue-500 mt-8 pt-6">
-            <div className="flex flex-col sm:flex-row justify-between items-center">
-              <p className="text-sm text-blue-100 mb-2 sm:mb-0">
-                Made with ❤️ Visily
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 };
