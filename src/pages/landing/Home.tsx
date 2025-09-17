@@ -1,38 +1,40 @@
-import React from 'react';
-import { Calendar, Search, Stethoscope, FileText } from 'lucide-react';
-import Footer from '@components/Footer';
-import Navbar from '@components/Navbar';
+import React from "react";
+import { Calendar, Search, Stethoscope, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HealthLinkDMS: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <Navbar/>
-
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-gray-100 to-gray-200 overflow-hidden">
-        {/* Background Image Overlay */}
-        <div className="absolute inset-0 bg-gray-300 opacity-30"></div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-6">
+        <div
+          className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/heroImg.jpg')" }}
+        >
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/50"></div>
+
+          {/* Content */}
+          <div className="relative text-center text-white">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Empowering Healthcare Operations
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8 leading-relaxed">
-              Streamline patient management, doctor scheduling, and billing with 
-              HealthLink DMS. Your comprehensive solution for efficient hospital 
+            <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8 leading-relaxed">
+              Streamline patient management, doctor scheduling, and billing with
+              HealthLink DMS. Your comprehensive solution for efficient hospital
               administration.
             </p>
-            <button className="bg-blue-600 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition duration-200">
-              Login to Dashboard
-            </button>
+            <Link to={"/login"}>
+              <button className="bg-blue-600 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition duration-200">
+                Login to Dashboard
+              </button>
+            </Link>
           </div>
         </div>
-        
+
         {/* Decorative Elements */}
-        <div className="absolute top-10 right-10 w-32 h-32 bg-blue-100 rounded-full opacity-20"></div>
-        <div className="absolute bottom-10 left-10 w-24 h-24 bg-blue-200 rounded-full opacity-30"></div>
+        <div className="absolute hidden md:block top-10 right-10 w-32 h-32 bg-blue-200 rounded-full opacity-20"></div>
+        <div className="absolute hidden md:block bottom-10 left-10 w-24 h-24 bg-blue-200 rounded-full opacity-30"></div>
       </section>
 
       {/* Key Features Section */}
@@ -43,7 +45,7 @@ const HealthLinkDMS: React.FC = () => {
               Key Features
             </h2>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Appointment Management */}
             <div className="text-center group hover:transform hover:scale-105 transition duration-300">
@@ -54,7 +56,7 @@ const HealthLinkDMS: React.FC = () => {
                 Appointment Management
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Effortlessly schedule, track, and manage patient appointments. 
+                Effortlessly schedule, track, and manage patient appointments.
                 Reduce wait times and improve patient flow.
               </p>
             </div>
@@ -68,7 +70,7 @@ const HealthLinkDMS: React.FC = () => {
                 Patient Records
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Securely store and access comprehensive patient histories, 
+                Securely store and access comprehensive patient histories,
                 diagnoses, and treatment plans in one place.
               </p>
             </div>
@@ -82,8 +84,8 @@ const HealthLinkDMS: React.FC = () => {
                 Doctor Portal
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Empower doctors with tools for patient interaction, 
-                record updates, and schedule management.
+                Empower doctors with tools for patient interaction, record
+                updates, and schedule management.
               </p>
             </div>
 
@@ -96,16 +98,13 @@ const HealthLinkDMS: React.FC = () => {
                 Integrated Billing
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Simplify invoicing, payment processing, and financial 
-                reporting with automated billing solutions.
+                Simplify invoicing, payment processing, and financial reporting
+                with automated billing solutions.
               </p>
             </div>
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <Footer/>
     </div>
   );
 };
