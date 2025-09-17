@@ -1,36 +1,36 @@
-import { Heart, Shield, Award, User } from "lucide-react";
+import { Heart, Shield, Award } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const teamMembers = [
   {
     name: "Dr. Ethan Hayes",
     role: "Chief of Cardiology",
-    image: "/api/placeholder/120/120",
+    image: "/images/doc1.jpg",
   },
   {
     name: "Dr. Olivia Chen",
     role: "Head of Surgery",
-    image: "/api/placeholder/120/120",
+    image: "/images/doc4.webp",
   },
   {
     name: "Dr. Maya Singh",
     role: "Director of Pediatrics",
-    image: "/api/placeholder/120/120",
+    image: "/images/doc5.jpg",
   },
   {
     name: "Dr. Benjamin Carter",
     role: "Lead Neurologist",
-    image: "/api/placeholder/120/120",
+    image: "/images/doc2.jpg",
   },
   {
     name: "Nurse Emily White",
     role: "Head Nurse",
-    image: "/api/placeholder/120/120",
+    image: "/images/doc6.webp",
   },
   {
     name: "Dr. Omar Hassan",
     role: "Radiology Specialist",
-    image: "/api/placeholder/120/120",
+    image: "/images/doc3.webp",
   },
 ];
 
@@ -175,9 +175,7 @@ const About = () => {
             {teamMembers.map((member, index) => (
               <div key={index} className="text-center">
                 <div className="w-20 h-20 md:w-24 md:h-24 bg-gray-300 rounded-full mx-auto mb-4 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                    <User className="w-10 h-10 text-white" />
-                  </div>
+                  <img src={member.image} className="w-full h-full object-cover object-top" />
                 </div>
                 <h3 className="font-semibold text-gray-800 text-sm md:text-base mb-1">
                   {member.name}
