@@ -9,7 +9,7 @@ import DashboardHome from "@pages/dashboard/home/Page";
 
 // A simple ProtectedRoute wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = false; // TODO: replace with real auth check (JWT/localStorage/context)
+  const isAuthenticated = true; // TODO: replace with real auth check (JWT/localStorage/context)
 
   if (!isAuthenticated) {
     return <Login />; // redirect or render login
