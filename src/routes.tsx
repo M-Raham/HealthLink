@@ -6,6 +6,12 @@ import Services from "@pages/landing/Services";
 import Login from "./auth/Login";
 import Signup from "./auth/SignUp";
 import DashboardHome from "@pages/dashboard/home/Page";
+import DashboardLayout from "./layouts/DashboardLayout";
+import PatientsPage from "@pages/dashboard/patients/Page";
+import DoctorsPage from "@pages/dashboard/doctors/Page";
+import ReportsPage from "@pages/dashboard/reports/Page";
+import BillingPage from "@pages/dashboard/billing/Page";
+import AppointmentsPage from "@pages/dashboard/appointments/Page";
 
 // A simple ProtectedRoute wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -48,28 +54,25 @@ const AppRoutes = () => {
       />
 
       {/* Auth Pages */}
-      <Route
-        path="/login"
-        element={
-          <Login />
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <Signup />
-        }
-      />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
 
       {/* Dashboard (Protected) */}
       <Route
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <DashboardHome />
+            <DashboardLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<DashboardHome />} />
+        <Route path="patients" element={<PatientsPage />} />
+        <Route path="doctors" element={<DoctorsPage />} />
+        <Route path="reports" element={<ReportsPage />} />
+        <Route path="billing" element={<BillingPage />} />
+        <Route path="appointments" element={<AppointmentsPage />} />
+      </Route>
     </Routes>
   );
 };
