@@ -1,4 +1,5 @@
 import { Heart, Brain, Bone, Baby, Syringe, Microscope } from "lucide-react";
+import { Link } from "react-router-dom";
 const services = [
   {
     icon: Heart,
@@ -6,6 +7,7 @@ const services = [
     description:
       "Comprehensive cardiac care, from diagnosis to advanced treatments, ensuring optimal heart health. Specializing in preventative care and chronic disease management.",
     buttonText: "Learn More",
+    link: "/services/cardiology",
   },
   {
     icon: Brain,
@@ -13,6 +15,7 @@ const services = [
     description:
       "Expert diagnosis and treatment for neurological disorders, including stroke, epilepsy, and migraines, focusing on patient recovery and well-being.",
     buttonText: "Learn More",
+    link: "/services/Neurology",
   },
   {
     icon: Bone,
@@ -20,6 +23,7 @@ const services = [
     description:
       "Specialized care for musculoskeletal conditions, including joint replacement, sports injuries, and spinal disorders, promoting mobility and pain relief.",
     buttonText: "Learn More",
+    link: "/services/Orthopedics",
   },
   {
     icon: Baby,
@@ -27,6 +31,7 @@ const services = [
     description:
       "Dedicated healthcare services for infants, children, and adolescents, covering growth, development, and common childhood illnesses. Creating a comforting environment for young patients.",
     buttonText: "Learn More",
+    link: "/services/Pediatrics",
   },
   {
     icon: Syringe,
@@ -34,6 +39,7 @@ const services = [
     description:
       "Holistic cancer care, offering chemotherapy, radiation, and surgical options, supported by compassionate counseling and personalized treatment services.",
     buttonText: "Learn More",
+    link: "/services/Oncology",
   },
   {
     icon: Microscope,
@@ -41,6 +47,7 @@ const services = [
     description:
       "Advanced imaging and laboratory services, including MRI, CT scans, and pathology, providing accurate and timely results for effective treatment planning.",
     buttonText: "Learn More",
+    link: "/services/Diagnostics",
   },
 ];
 
@@ -76,7 +83,10 @@ const Services = () => {
             {services.map((service, index) => {
               const IconComponent = service.icon;
               return (
-                <div key={index} className="text-center py-2 flex flex-col justify-between items-center">
+                <div
+                  key={index}
+                  className="text-center py-2 flex flex-col justify-between items-center"
+                >
                   <div>
                     {/* Icon */}
                     <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -93,9 +103,12 @@ const Services = () => {
                   </div>
 
                   {/* Learn More Button */}
-                  <button className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-2 rounded-md font-medium transition-colors duration-200 w-fit">
+                  <Link
+                    to={service.link}
+                    className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-2 rounded-md font-medium transition-colors duration-200 w-fit"
+                  >
                     {service.buttonText}
-                  </button>
+                  </Link>
                 </div>
               );
             })}

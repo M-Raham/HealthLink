@@ -2,9 +2,17 @@ import { Route, Routes } from "react-router-dom";
 import Layout from "./layouts/layout";
 import Home from "@pages/landing/Home";
 import About from "@pages/landing/About";
-import Services from "@pages/landing/Services";
+import Services from "@pages/landing/services/Services";
+import Cardiology from "@pages/landing/services/Cardiology";
+import Neurology from "@pages/landing/services/Neurology";
+import Orthopedics from "@pages/landing/services/Orthopedics";
+import Pediatrics from "@pages/landing/services/Pediatrics";
+import Oncology from "@pages/landing/services/Oncology";
+import Diagnostics from "@pages/landing/services/Diagnostics";
+
 import Login from "./auth/Login";
 import Signup from "./auth/SignUp";
+
 import DashboardHome from "@pages/dashboard/home/Page";
 import DashboardLayout from "./layouts/DashboardLayout";
 import PatientsPage from "@pages/dashboard/patients/Page";
@@ -12,6 +20,7 @@ import DoctorsPage from "@pages/dashboard/doctors/Page";
 import ReportsPage from "@pages/dashboard/reports/Page";
 import BillingPage from "@pages/dashboard/billing/Page";
 import AppointmentsPage from "@pages/dashboard/appointments/Page";
+import SettingsPage from "@pages/dashboard/settings/Page";
 
 // A simple ProtectedRoute wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -52,6 +61,55 @@ const AppRoutes = () => {
           </Layout>
         }
       />
+      {/* Service Details */}
+      <Route
+        path="/services/cardiology"
+        element={
+          <Layout>
+            <Cardiology />
+          </Layout>
+        }
+      />
+      <Route
+        path="/services/neurology"
+        element={
+          <Layout>
+            <Neurology />
+          </Layout>
+        }
+      />
+      <Route
+        path="/services/orthopedics"
+        element={
+          <Layout>
+            <Orthopedics />
+          </Layout>
+        }
+      />
+      <Route
+        path="/services/pediatrics"
+        element={
+          <Layout>
+            <Pediatrics />
+          </Layout>
+        }
+      />
+      <Route
+        path="/services/oncology"
+        element={
+          <Layout>
+            <Oncology />
+          </Layout>
+        }
+      />
+      <Route
+        path="/services/diagnostics"
+        element={
+          <Layout>
+            <Diagnostics />
+          </Layout>
+        }
+      />
 
       {/* Auth Pages */}
       <Route path="/login" element={<Login />} />
@@ -72,6 +130,7 @@ const AppRoutes = () => {
         <Route path="reports" element={<ReportsPage />} />
         <Route path="billing" element={<BillingPage />} />
         <Route path="appointments" element={<AppointmentsPage />} />
+        <Route path="settings" element={<SettingsPage />} />
       </Route>
     </Routes>
   );
