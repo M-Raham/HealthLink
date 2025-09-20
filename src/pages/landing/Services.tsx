@@ -76,24 +76,24 @@ const Services = () => {
             {services.map((service, index) => {
               const IconComponent = service.icon;
               return (
-                <div key={index} className="text-center">
-                  {/* Icon */}
-                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <IconComponent className="w-10 h-10 text-blue-600" />
+                <div key={index} className="text-center py-2 flex flex-col justify-between items-center">
+                  <div>
+                    {/* Icon */}
+                    <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <IconComponent className="w-10 h-10 text-blue-600" />
+                    </div>
+                    {/* Title */}
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                      {service.title}
+                    </h2>
+                    {/* Description */}
+                    <p className="text-gray-600 leading-relaxed mb-6 max-w-sm mx-auto">
+                      {service.description}
+                    </p>
                   </div>
 
-                  {/* Title */}
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                    {service.title}
-                  </h2>
-
-                  {/* Description */}
-                  <p className="text-gray-600 leading-relaxed mb-6 max-w-sm mx-auto">
-                    {service.description}
-                  </p>
-
                   {/* Learn More Button */}
-                  <button className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-2 rounded-md font-medium transition-colors duration-200">
+                  <button className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-2 rounded-md font-medium transition-colors duration-200 w-fit">
                     {service.buttonText}
                   </button>
                 </div>
