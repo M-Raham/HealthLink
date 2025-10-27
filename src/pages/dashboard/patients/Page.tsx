@@ -1,13 +1,23 @@
-import { useState } from 'react';
-import { Search, Filter, Plus, Edit, Trash2, ChevronDown, X } from 'lucide-react';
+import { useState } from "react";
+import {
+  Search,
+  Filter,
+  Plus,
+  Edit,
+  Trash2,
+  ChevronDown,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const DOCTORS = [
-  'Dr. Emily Chen',
-  'Dr. Alex Johnson',
-  'Dr. David Lee',
-  'Dr. Sarah Patel',
+  "Dr. Emily Chen",
+  "Dr. Alex Johnson",
+  "Dr. David Lee",
+  "Dr. Sarah Patel",
 ];
+
+const ACCOMODATION = ["General", "Specialist", "Emergency"];
 
 interface Patient {
   id: number;
@@ -16,35 +26,77 @@ interface Patient {
   gender: string;
   disease: string;
   doctor: string;
+  accommodate: string;
 }
 
 const Page = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [patients, setPatients] = useState<Patient[]>([
-    { id: 1, name: 'Alice Wonderland', age: 34, gender: 'Female', disease: 'Hypertension', doctor: 'Dr. Emily Chen' },
-    { id: 2, name: 'Bob The Builder', age: 52, gender: 'Male', disease: 'Type 2 Diabetes', doctor: 'Dr. Alex Johnson' },
-    { id: 3, name: 'Charlie Chaplin', age: 28, gender: 'Male', disease: 'Asthma', doctor: 'Dr. David Lee' },
-    { id: 4, name: 'Diana Prince', age: 45, gender: 'Female', disease: 'Osteoarthritis', doctor: 'Dr. Emily Chen' },
-    { id: 5, name: 'Eve Harrington', age: 67, gender: 'Female', disease: 'Coronary Artery Disease', doctor: 'Dr. Alex Johnson' },
+    {
+      id: 1,
+      name: "Alice Wonderland",
+      age: 34,
+      gender: "Female",
+      disease: "Hypertension",
+      accommodate: "General",
+      doctor: "Dr. Emily Chen",
+    },
+    {
+      id: 2,
+      name: "Bob The Builder",
+      age: 52,
+      gender: "Male",
+      disease: "Type 2 Diabetes",
+      accommodate: "Spectialist",
+      doctor: "Dr. Alex Johnson",
+    },
+    {
+      id: 3,
+      name: "Charlie Chaplin",
+      age: 28,
+      gender: "Male",
+      disease: "Asthma",
+      accommodate: "Emergency",
+      doctor: "Dr. David Lee",
+    },
+    {
+      id: 4,
+      name: "Diana Prince",
+      age: 45,
+      gender: "Female",
+      disease: "Osteoarthritis",
+      accommodate: "General",
+      doctor: "Dr. Emily Chen",
+    },
+    {
+      id: 5,
+      name: "Eve Harrington",
+      age: 67,
+      gender: "Female",
+      disease: "Coronary Artery Disease",
+      accommodate: "Emergency",
+      doctor: "Dr. Alex Johnson",
+    },
   ]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPatientId, setEditingPatientId] = useState<number | null>(null);
 
-  const [formName, setFormName] = useState('');
-  const [formAge, setFormAge] = useState<number | ''>('');
-  const [formGender, setFormGender] = useState('Male');
-  const [formDisease, setFormDisease] = useState('To be diagnosed');
+  const [formName, setFormName] = useState("");
+  const [formAge, setFormAge] = useState<number | "">("");
+  const [formGender, setFormGender] = useState("Male");
+  const [formDisease, setFormDisease] = useState("To be diagnosed");
   const [formDoctor, setFormDoctor] = useState(DOCTORS[0]);
+  const [formAccomodation, setFormAccomodation] = useState(ACCOMODATION[0]);
 
   const resetForm = () => {
     setEditingPatientId(null);
-    setFormName('');
-    setFormAge('');
-    setFormGender('Male');
-    setFormDisease('To be diagnosed');
+    setFormName("");
+    setFormAge("");
+    setFormGender("Male");
+    setFormDisease("To be diagnosed");
     setFormDoctor(DOCTORS[0]);
   };
 
@@ -69,7 +121,7 @@ const Page = () => {
   };
 
   const handleSavePatient = () => {
-    if (!formName || formAge === '' || !formGender || !formDoctor) {
+    if (!formName || formAge === "" || !formGender || !formDoctor) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -80,16 +132,24 @@ const Page = () => {
         name: formName,
         age: Number(formAge),
         gender: formGender,
-        disease: formDisease || 'To be diagnosed',
+        disease: formDisease || "To be diagnosed",
         doctor: formDoctor,
+        accommodate: formAccomodation,
       };
-      setPatients(prev => [...prev, newPatient]);
+      setPatients((prev) => [...prev, newPatient]);
       toast.success(`Patient ${formName} added successfully`);
     } else {
-      setPatients(prev =>
-        prev.map(p =>
+      setPatients((prev) =>
+        prev.map((p) =>
           p.id === editingPatientId
-            ? { ...p, name: formName, age: Number(formAge), gender: formGender, disease: formDisease, doctor: formDoctor }
+            ? {
+                ...p,
+                name: formName,
+                age: Number(formAge),
+                gender: formGender,
+                disease: formDisease,
+                doctor: formDoctor,
+              }
             : p
         )
       );
@@ -100,17 +160,18 @@ const Page = () => {
   };
 
   const handleDelete = (patientId: number) => {
-    const deletedPatient = patients.find(p => p.id === patientId);
+    const deletedPatient = patients.find((p) => p.id === patientId);
     if (!deletedPatient) return;
 
-    setPatients(prev => prev.filter(p => p.id !== patientId));
+    setPatients((prev) => prev.filter((p) => p.id !== patientId));
     toast.info(`Deleted ${deletedPatient.name}`);
   };
 
-  const filteredPatients = patients.filter(patient =>
-    patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    patient.disease.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    patient.doctor.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredPatients = patients.filter(
+    (patient) =>
+      patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.disease.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.doctor.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -147,12 +208,27 @@ const Page = () => {
             {isFilterOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
                 <div className="p-3 space-y-2 text-sm text-gray-700">
-                  <label className="flex items-center"><input type="checkbox" className="mr-2" />Male</label>
-                  <label className="flex items-center"><input type="checkbox" className="mr-2" />Female</label>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Male
+                  </label>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Female
+                  </label>
                   <hr className="my-2" />
-                  <label className="flex items-center"><input type="checkbox" className="mr-2" />Age 18–30</label>
-                  <label className="flex items-center"><input type="checkbox" className="mr-2" />Age 31–50</label>
-                  <label className="flex items-center"><input type="checkbox" className="mr-2" />Age 50+</label>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Age 18–30
+                  </label>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Age 31–50
+                  </label>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Age 50+
+                  </label>
                 </div>
               </div>
             )}
@@ -174,8 +250,19 @@ const Page = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                {['Patient Name', 'Age', 'Gender', 'Disease', 'Doctor Assigned', 'Actions'].map((h) => (
-                  <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {[
+                  "Patient Name",
+                  "Age",
+                  "Gender",
+                  "Disease",
+                  "Accommodation",
+                  "Doctor Assigned",
+                  "Actions",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     {h}
                   </th>
                 ))}
@@ -183,12 +270,28 @@ const Page = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredPatients.map((patient) => (
-                <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{patient.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{patient.age}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{patient.gender}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{patient.disease}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{patient.doctor}</td>
+                <tr
+                  key={patient.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    {patient.name}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {patient.age}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {patient.gender}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {patient.disease}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {patient.accommodate}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    {patient.doctor}
+                  </td>
                   <td className="px-6 py-4 text-sm font-medium">
                     <div className="flex space-x-2">
                       <button
@@ -222,11 +325,17 @@ const Page = () => {
 
       {/* Footer */}
       <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-        <span>Showing {filteredPatients.length} of {patients.length} patients</span>
+        <span>
+          Showing {filteredPatients.length} of {patients.length} patients
+        </span>
         <div className="flex items-center space-x-2">
-          <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">Previous</button>
+          <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">
+            Previous
+          </button>
           <span>Page 1 of 1</span>
-          <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">Next</button>
+          <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">
+            Next
+          </button>
         </div>
       </div>
 
@@ -238,10 +347,12 @@ const Page = () => {
             <div className="flex items-start justify-between px-6 py-4 border-b border-gray-200">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  {editingPatientId ? 'Edit Patient' : 'Add New Patient'}
+                  {editingPatientId ? "Edit Patient" : "Add New Patient"}
                 </h2>
                 <p className="text-sm text-gray-500">
-                  {editingPatientId ? 'Update patient details below.' : 'Add patient details below.'}
+                  {editingPatientId
+                    ? "Update patient details below."
+                    : "Add patient details below."}
                 </p>
               </div>
               <button
@@ -254,7 +365,9 @@ const Page = () => {
 
             <div className="px-6 py-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name<span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name<span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   value={formName}
@@ -266,18 +379,26 @@ const Page = () => {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Age<span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Age<span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="number"
                     min={0}
                     value={formAge}
-                    onChange={(e) => setFormAge(e.target.value === '' ? '' : Number(e.target.value))}
+                    onChange={(e) =>
+                      setFormAge(
+                        e.target.value === "" ? "" : Number(e.target.value)
+                      )
+                    }
                     placeholder="Age"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Gender<span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gender<span className="text-red-500">*</span>
+                  </label>
                   <select
                     value={formGender}
                     onChange={(e) => setFormGender(e.target.value)}
@@ -291,7 +412,9 @@ const Page = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Disease / Issue</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Disease / Issue
+                </label>
                 <input
                   type="text"
                   value={formDisease}
@@ -302,28 +425,52 @@ const Page = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Doctor Assigned<span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Doctor Assigned<span className="text-red-500">*</span>
+                </label>
                 <select
                   value={formDoctor}
                   onChange={(e) => setFormDoctor(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-white"
                 >
                   {DOCTORS.map((doc) => (
-                    <option key={doc} value={doc}>{doc}</option>
+                    <option key={doc} value={doc}>
+                      {doc}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Accomodation<span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formAccomodation}
+                  onChange={(e) => setFormAccomodation(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-white"
+                >
+                  {ACCOMODATION.map((aoc) => (
+                    <option key={aoc} value={aoc}>
+                      {aoc}
+                    </option>
                   ))}
                 </select>
               </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-              <button onClick={closeModal} className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+              >
                 Cancel
               </button>
               <button
                 onClick={handleSavePatient}
                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                {editingPatientId ? 'Save Changes' : 'Add Patient'}
+                {editingPatientId ? "Save Changes" : "Add Patient"}
               </button>
             </div>
           </div>
