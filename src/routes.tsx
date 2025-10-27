@@ -11,7 +11,6 @@ import PatientsPage from "@pages/dashboard/patients/Page";
 import DoctorsPage from "@pages/dashboard/doctors/Page";
 import ReportsPage from "@pages/dashboard/reports/Page";
 import BillingPage from "@pages/dashboard/billing/Page";
-import AppointmentsPage from "@pages/dashboard/appointments/Page";
 
 // A simple ProtectedRoute wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -71,7 +70,6 @@ const AppRoutes = () => {
         <Route path="doctors" element={<DoctorsPage />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="billing" element={<BillingPage />} />
-        <Route path="appointments" element={<AppointmentsPage />} />
       </Route>
     </Routes>
   );

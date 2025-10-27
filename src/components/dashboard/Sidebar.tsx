@@ -1,6 +1,5 @@
 import {
   Users,
-  Calendar,
   UserCheck,
   BarChart3,
   FileText,
@@ -13,7 +12,6 @@ const sidebarItems = [
   { icon: BarChart3, label: "Dashboard", path: "/dashboard" },
   { icon: Users, label: "Patients", path: "/dashboard/patients" },
   { icon: UserCheck, label: "Doctors", path: "/dashboard/doctors" },
-  { icon: Calendar, label: "Appointments", path: "/dashboard/appointments" },
   { icon: CreditCard, label: "Billing", path: "/dashboard/billing" },
   { icon: FileText, label: "Reports", path: "/dashboard/reports" },
 ];
