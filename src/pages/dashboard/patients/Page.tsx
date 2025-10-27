@@ -1,11 +1,14 @@
-import { useState } from 'react';
-import { Search, Filter, Plus, Edit, Trash2, ChevronDown } from 'lucide-react';
+import { useState } from "react";
+import { Search, Plus, Edit, Trash2, X } from "lucide-react";
 
-const Page = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+const DOCTORS = [
+  "Dr. Emily Chen",
+  "Dr. Alex Johnson",
+  "Dr. David Lee",
+  "Dr. Sarah Patel",
+];
 
-  interface Patient {
+interface Patient {
   id: number;
   name: string;
   age: number;
@@ -14,66 +17,145 @@ const Page = () => {
   doctor: string;
 }
 
-  const patients: Patient[] = [
+const Page = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // patients state so we can add/edit
+  const [patients, setPatients] = useState<Patient[]>([
     {
       id: 1,
-      name: 'Alice Wonderland',
+      name: "Alice Wonderland",
       age: 34,
-      gender: 'Female',
-      disease: 'Hypertension',
-      doctor: 'Dr. Emily Chen'
+      gender: "Female",
+      disease: "Hypertension",
+      doctor: "Dr. Emily Chen",
     },
     {
       id: 2,
-      name: 'Bob The Builder',
+      name: "Bob The Builder",
       age: 52,
-      gender: 'Male',
-      disease: 'Type 2 Diabetes',
-      doctor: 'Dr. Alex Johnson'
+      gender: "Male",
+      disease: "Type 2 Diabetes",
+      doctor: "Dr. Alex Johnson",
     },
     {
       id: 3,
-      name: 'Charlie Chaplin',
+      name: "Charlie Chaplin",
       age: 28,
-      gender: 'Male',
-      disease: 'Asthma',
-      doctor: 'Dr. David Lee'
+      gender: "Male",
+      disease: "Asthma",
+      doctor: "Dr. David Lee",
     },
     {
       id: 4,
-      name: 'Diana Prince',
+      name: "Diana Prince",
       age: 45,
-      gender: 'Female',
-      disease: 'Osteoarthritis',
-      doctor: 'Dr. Emily Chen'
+      gender: "Female",
+      disease: "Osteoarthritis",
+      doctor: "Dr. Emily Chen",
     },
     {
       id: 5,
-      name: 'Eve Harrington',
+      name: "Eve Harrington",
       age: 67,
-      gender: 'Female',
-      disease: 'Coronary Artery Disease',
-      doctor: 'Dr. Alex Johnson'
+      gender: "Female",
+      disease: "Coronary Artery Disease",
+      doctor: "Dr. Alex Johnson",
+    },
+  ]);
+
+  // --- Modal state ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPatientId, setEditingPatientId] = useState<number | null>(null);
+
+  // form fields
+  const [formName, setFormName] = useState("");
+  const [formAge, setFormAge] = useState<number | "">("");
+  const [formGender, setFormGender] = useState("Male");
+  const [formDisease, setFormDisease] = useState("To be diagnosed");
+  const [formDoctor, setFormDoctor] = useState(DOCTORS[0]);
+
+  const resetForm = () => {
+    setEditingPatientId(null);
+    setFormName("");
+    setFormAge("");
+    setFormGender("Male");
+    setFormDisease("To be diagnosed");
+    setFormDoctor(DOCTORS[0]);
+  };
+
+  const openAddModal = () => {
+    resetForm();
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (patient: Patient) => {
+    setEditingPatientId(patient.id);
+    setFormName(patient.name);
+    setFormAge(patient.age);
+    setFormGender(patient.gender);
+    setFormDisease(patient.disease);
+    setFormDoctor(patient.doctor);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    resetForm();
+  };
+
+  const handleSavePatient = () => {
+    // basic validation
+    if (!formName || formAge === "" || !formGender || !formDoctor) {
+      alert("Please fill required fields.");
+      return;
     }
-  ];
 
-  const filteredPatients = patients.filter(patient =>
-    patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    patient.disease.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    patient.doctor.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    if (editingPatientId === null) {
+      // create new patient
+      const newPatient: Patient = {
+        id: Date.now(), // temp id
+        name: formName,
+        age: Number(formAge),
+        gender: formGender,
+        disease: formDisease || "To be diagnosed",
+        doctor: formDoctor,
+      };
+      setPatients((prev) => [...prev, newPatient]);
+    } else {
+      // update existing
+      setPatients((prev) =>
+        prev.map((p) =>
+          p.id === editingPatientId
+            ? {
+                ...p,
+                name: formName,
+                age: Number(formAge),
+                gender: formGender,
+                disease: formDisease || "To be diagnosed",
+                doctor: formDoctor,
+              }
+            : p
+        )
+      );
+    }
 
-  const handleEdit = (patientId: number) => {
-    console.log('Edit patient:', patientId);
+    closeModal();
   };
 
   const handleDelete = (patientId: number) => {
-    console.log('Delete patient:', patientId);
+    // temporary delete logic
+    if (window.confirm("Are you sure you want to delete this patient?")) {
+      setPatients((prev) => prev.filter((p) => p.id !== patientId));
+    }
   };
 
-  const handleAddNewPatient = () => {
-    console.log('Add new patient');
-  };
+  const filteredPatients = patients.filter(
+    (patient) =>
+      patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.disease.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.doctor.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="p-6">
@@ -94,51 +176,10 @@ const Page = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
-        
+
         <div className="flex gap-3">
-          <div className="relative">
-            <button
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Filter className="w-4 h-4" />
-              <span>Filter</span>
-              <ChevronDown className="w-4 h-4" />
-            </button>
-            
-            {isFilterOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                <div className="p-3">
-                  <div className="space-y-2">
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      <span className="text-sm">Male</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      <span className="text-sm">Female</span>
-                    </label>
-                    <hr className="my-2" />
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      <span className="text-sm">Age 18-30</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      <span className="text-sm">Age 31-50</span>
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      <span className="text-sm">Age 50+</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-          
           <button
-            onClick={handleAddNewPatient}
+            onClick={openAddModal}
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
@@ -175,26 +216,37 @@ const Page = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredPatients.map((patient) => (
-                <tr key={patient.id} className="hover:bg-gray-50 transition-colors">
+                <tr
+                  key={patient.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{patient.name}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {patient.name}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{patient.age}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.gender}</div>
+                    <div className="text-sm text-gray-900">
+                      {patient.gender}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.disease}</div>
+                    <div className="text-sm text-gray-900">
+                      {patient.disease}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{patient.doctor}</div>
+                    <div className="text-sm text-gray-900">
+                      {patient.doctor}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => handleEdit(patient.id)}
+                        onClick={() => openEditModal(patient)}
                         className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded transition-colors"
                         title="Edit Patient"
                       >
@@ -241,6 +293,141 @@ const Page = () => {
           </button>
         </div>
       </div>
+
+      {/* MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* overlay */}
+          <div className="absolute inset-0 bg-black/40" onClick={closeModal} />
+
+          {/* modal card */}
+          <div className="relative bg-white rounded-lg shadow-lg border border-gray-200 w-full max-w-md mx-4">
+            {/* header */}
+            <div className="flex items-start justify-between px-6 py-4 border-b border-gray-200">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {editingPatientId === null
+                    ? "Add New Patient"
+                    : "Edit Patient"}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {editingPatientId === null
+                    ? "Add patient details below."
+                    : "Update patient details below."}
+                </p>
+              </div>
+
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded p-1 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* body */}
+            <div className="px-6 py-4 space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name<span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  placeholder="Enter full name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+              </div>
+
+              {/* Age + Gender in a row */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Age<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={formAge}
+                    onChange={(e) =>
+                      setFormAge(
+                        e.target.value === "" ? "" : Number(e.target.value)
+                      )
+                    }
+                    placeholder="Age"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gender<span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={formGender}
+                    onChange={(e) => setFormGender(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
+                  >
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Disease */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Disease / Issue
+                </label>
+                <input
+                  type="text"
+                  value={formDisease}
+                  onChange={(e) => setFormDisease(e.target.value)}
+                  placeholder="To be diagnosed"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+              </div>
+
+              {/* Doctor */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Doctor Assigned<span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formDoctor}
+                  onChange={(e) => setFormDoctor(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white"
+                >
+                  {DOCTORS.map((doc) => (
+                    <option key={doc} value={doc}>
+                      {doc}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSavePatient}
+                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                {editingPatientId === null ? "Add Patient" : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

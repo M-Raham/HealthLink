@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormData, Role } from "../types";
+import { FormData } from "../types";
 
 const Signup = () => {
   const [formData, setFormData] = useState<FormData>({
@@ -17,13 +17,6 @@ const Signup = () => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-
-  const handleRoleChange = (role: Role) => {
-    setFormData((prev) => ({
-      ...prev,
-      role,
     }));
   };
 
@@ -89,26 +82,6 @@ const Signup = () => {
               placeholder="********"
               required
             />
-          </div>
-
-          {/* Role */}
-          <div>
-            <label className="block text-sm font-medium mb-3">Role</label>
-            <div className="flex gap-6">
-              {["Admin", "Doctor", "Patient"].map((role) => (
-                <label key={role} className="flex items-center cursor-pointer">
-                  <input
-                    type="radio"
-                    name="role"
-                    value={role}
-                    checked={formData.role === role}
-                    onChange={() => handleRoleChange(role as Role)}
-                    className="w-4 h-4 text-blue-600"
-                  />
-                  <span className="ml-2 text-gray-700">{role}</span>
-                </label>
-              ))}
-            </div>
           </div>
 
           <button
