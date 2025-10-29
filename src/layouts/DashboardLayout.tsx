@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "@components/dashboard/Navbar";
 import Sidebar from "@components/dashboard/Sidebar";
 import { Outlet } from "react-router-dom";
+import { Toaster } from "@components/ui/Sonner";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -18,6 +19,7 @@ const DashboardLayout = () => {
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto p-6">
+          <Toaster />
           <Outlet />
         </main>
       </div>
