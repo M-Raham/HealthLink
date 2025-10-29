@@ -20,8 +20,6 @@ import DoctorsPage from "@pages/dashboard/doctors/Page";
 import ReportsPage from "@pages/dashboard/reports/Page";
 import BillingPage from "@pages/dashboard/billing/Page";
 import AppointmentsPage from "@pages/dashboard/appointments/Page";
-import SettingsPage from "@pages/dashboard/settings/Page";
-
 // A simple ProtectedRoute wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = true; // TODO: replace with real auth check (JWT/localStorage/context)
@@ -130,7 +128,6 @@ const AppRoutes = () => {
         <Route path="reports" element={<ReportsPage />} />
         <Route path="billing" element={<BillingPage />} />
         <Route path="appointments" element={<AppointmentsPage />} />
-        <Route path="settings" element={<SettingsPage />} />
       </Route>
     </Routes>
   );

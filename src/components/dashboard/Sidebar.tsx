@@ -5,7 +5,6 @@ import {
   FileText,
   CreditCard,
   LogOut,
-  SettingsIcon,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -15,7 +14,6 @@ const sidebarItems = [
   { icon: UserCheck, label: "Doctors", path: "/dashboard/doctors" },
   { icon: CreditCard, label: "Billing", path: "/dashboard/billing" },
   { icon: FileText, label: "Reports", path: "/dashboard/reports" },
-  { icon: SettingsIcon, label: "Settings", path: "/dashboard/settings" },
 ];
 
 interface SidebarProps {

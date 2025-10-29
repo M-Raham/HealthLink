@@ -1,11 +1,9 @@
 import { useState } from "react";
 import {
   Search,
-  Filter,
   Plus,
   Edit,
   Trash2,
-  ChevronDown,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -31,7 +29,6 @@ interface Patient {
 
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const [patients, setPatients] = useState<Patient[]>([
     {
@@ -195,44 +192,6 @@ const Page = () => {
         </div>
 
         <div className="flex gap-3">
-          <div className="relative">
-            <button
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <Filter className="w-4 h-4" />
-              <span>Filter</span>
-              <ChevronDown className="w-4 h-4" />
-            </button>
-
-            {isFilterOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                <div className="p-3 space-y-2 text-sm text-gray-700">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Male
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Female
-                  </label>
-                  <hr className="my-2" />
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Age 18–30
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Age 31–50
-                  </label>
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    Age 50+
-                  </label>
-                </div>
-              </div>
-            )}
-          </div>
 
           <button
             onClick={openAddModal}
