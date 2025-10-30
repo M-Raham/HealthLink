@@ -14,6 +14,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { AppointmentBookingForm } from "../../components/forms/AppointmentBookingForm";
 
 const HealthLinkDMS: React.FC = () => {
   const stats = [
@@ -302,6 +303,13 @@ const HealthLinkDMS: React.FC = () => {
               Services We Provide
             </button>
           </div>
+        </div>
+      </section>
+
+      {/* Appointment Booking Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AppointmentBookingForm />
         </div>
       </section>
 

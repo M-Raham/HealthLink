@@ -11,7 +11,8 @@ import Oncology from "@pages/landing/services/Oncology";
 import Diagnostics from "@pages/landing/services/Diagnostics";
 
 import Login from "./auth/Login";
-import Signup from "./auth/SignUp";
+import { useAuth } from "./contexts/AuthContext";
+import { LoadingSpinner } from "./components/common/LoadingSpinner";
 
 import DashboardHome from "@pages/dashboard/home/Page";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -20,12 +21,22 @@ import DoctorsPage from "@pages/dashboard/doctors/Page";
 import ReportsPage from "@pages/dashboard/reports/Page";
 import BillingPage from "@pages/dashboard/billing/Page";
 import AppointmentsPage from "@pages/dashboard/appointments/Page";
-// A simple ProtectedRoute wrapper
+import AvailabilityPage from "@pages/dashboard/availability/Page";
+
+// Protected Route wrapper with proper authentication
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = true; // TODO: replace with real auth check (JWT/localStorage/context)
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
-    return <Login />; // redirect or render login
+    return <Login />;
   }
 
   return <>{children}</>;
@@ -111,7 +122,6 @@ const AppRoutes = () => {
 
       {/* Auth Pages */}
       <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
 
       {/* Dashboard (Protected) */}
       <Route
@@ -125,9 +135,10 @@ const AppRoutes = () => {
         <Route index element={<DashboardHome />} />
         <Route path="patients" element={<PatientsPage />} />
         <Route path="doctors" element={<DoctorsPage />} />
+        <Route path="appointments" element={<AppointmentsPage />} />
+        <Route path="availability" element={<AvailabilityPage />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="billing" element={<BillingPage />} />
-        <Route path="appointments" element={<AppointmentsPage />} />
       </Route>
     </Routes>
   );

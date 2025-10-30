@@ -1,4 +1,7 @@
-export type Role = "Admin" | "Doctor" | "Patient";
+// Re-export API types for backward compatibility
+export * from './types/api';
+
+export type Role = "admin" | "doctor";
 
 export interface FormData {
   name?: string;

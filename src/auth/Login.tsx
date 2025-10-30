@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormData } from "../types";
+import { useAuth } from "../contexts/AuthContext";
+import { LoadingSpinner } from "../components/common/LoadingSpinner";
+import { ErrorMessage } from "../components/common/ErrorMessage";
 
 const Login = () => {
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "Patient",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -17,19 +20,22 @@ const Login = () => {
       ...prev,
       [name]: value,
     }));
+    setError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
-    console.log("Login submitted:", formData);
-
-    // fake auth delay
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await login(formData.email, formData.password);
       navigate("/dashboard");
-    }, 1500);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,6 +46,10 @@ const Login = () => {
           <p className="text-gray-600">Access your HealthLink dashboard.</p>
         </div>
 
+        {error && (
+          <ErrorMessage message={error} className="mb-6" />
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email */}
           <div>
@@ -49,8 +59,8 @@ const Login = () => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border rounded-md"
-              placeholder="your.email@example.com"
+              className="w-full px-4 py-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="admin@healthlink.com"
               required
             />
           </div>
@@ -63,8 +73,8 @@ const Login = () => {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border rounded-md"
-              placeholder="********"
+              className="w-full px-4 py-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="admin123"
               required
             />
           </div>
@@ -73,9 +83,16 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 disabled:opacity-70"
+            className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 disabled:opacity-70 flex items-center justify-center"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? (
+              <>
+                <LoadingSpinner size="sm" className="mr-2" />
+                Logging in...
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
       </div>

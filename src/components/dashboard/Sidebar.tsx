@@ -5,16 +5,11 @@ import {
   FileText,
   CreditCard,
   LogOut,
+  Calendar,
+  Stethoscope,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
-
-const sidebarItems = [
-  { icon: BarChart3, label: "Dashboard", path: "/dashboard" },
-  { icon: Users, label: "Patients", path: "/dashboard/patients" },
-  { icon: UserCheck, label: "Doctors", path: "/dashboard/doctors" },
-  { icon: CreditCard, label: "Billing", path: "/dashboard/billing" },
-  { icon: FileText, label: "Reports", path: "/dashboard/reports" },
-];
+import { NavLink } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -22,13 +17,44 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
-  const navigate = useNavigate();
+  const { logout, isAdmin, isDoctor } = useAuth();
 
   const handleLogout = () => {
-    // later you can also clear auth tokens here
-    navigate("/"); // redirect to landing Home
+    logout();
     onClose(); // close sidebar on mobile
   };
+
+  // Dynamic sidebar items based on user role
+  const getSidebarItems = () => {
+    const commonItems = [
+      { icon: BarChart3, label: "Dashboard", path: "/dashboard" },
+    ];
+
+    if (isAdmin) {
+      return [
+        ...commonItems,
+        { icon: UserCheck, label: "Doctors", path: "/dashboard/doctors" },
+        { icon: Users, label: "Patients", path: "/dashboard/patients" },
+        { icon: Calendar, label: "Appointments", path: "/dashboard/appointments" },
+        { icon: FileText, label: "Reports", path: "/dashboard/reports" },
+        { icon: CreditCard, label: "Billing", path: "/dashboard/billing" },
+      ];
+    }
+
+    if (isDoctor) {
+      return [
+        ...commonItems,
+        { icon: Calendar, label: "My Appointments", path: "/dashboard/appointments" },
+        { icon: Users, label: "My Patients", path: "/dashboard/patients" },
+        { icon: Stethoscope, label: "Availability", path: "/dashboard/availability" },
+        { icon: FileText, label: "Reports", path: "/dashboard/reports" },
+      ];
+    }
+
+    return commonItems;
+  };
+
+  const sidebarItems = getSidebarItems();
 
   return (
     <>
