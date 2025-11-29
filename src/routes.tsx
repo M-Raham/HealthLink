@@ -22,6 +22,7 @@ import ReportsPage from "@pages/dashboard/reports/Page";
 import BillingPage from "@pages/dashboard/billing/Page";
 import AppointmentsPage from "@pages/dashboard/appointments/Page";
 import AvailabilityPage from "@pages/dashboard/availability/Page";
+import { AppointmentBookingForm } from "@components/forms/AppointmentBookingForm";
 
 // Protected Route wrapper with proper authentication
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -67,6 +68,14 @@ const AppRoutes = () => {
         element={
           <Layout>
             <Services />
+          </Layout>
+        }
+      />
+      <Route
+        path="/appointment"
+        element={
+          <Layout>
+            <AppointmentBookingForm />
           </Layout>
         }
       />

@@ -34,6 +34,12 @@ const Navbar = () => {
             >
               Services
             </Link>
+            <Link
+              to="/appointment"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
+              Book Appointment
+            </Link>
           </nav>
 
           {/* Desktop Auth Buttons */}
