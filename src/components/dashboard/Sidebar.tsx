@@ -7,6 +7,7 @@ import {
   LogOut,
   Calendar,
   Stethoscope,
+  User,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -17,7 +18,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
-  const { logout, isAdmin, isDoctor } = useAuth();
+  const { user, logout, isAdmin, isDoctor } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -35,7 +36,11 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         ...commonItems,
         { icon: UserCheck, label: "Doctors", path: "/dashboard/doctors" },
         { icon: Users, label: "Patients", path: "/dashboard/patients" },
-        { icon: Calendar, label: "Appointments", path: "/dashboard/appointments" },
+        {
+          icon: Calendar,
+          label: "Appointments",
+          path: "/dashboard/appointments",
+        },
         { icon: FileText, label: "Reports", path: "/dashboard/reports" },
         { icon: CreditCard, label: "Billing", path: "/dashboard/billing" },
       ];
@@ -44,9 +49,17 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     if (isDoctor) {
       return [
         ...commonItems,
-        { icon: Calendar, label: "My Appointments", path: "/dashboard/appointments" },
+        {
+          icon: Calendar,
+          label: "My Appointments",
+          path: "/dashboard/appointments",
+        },
         { icon: Users, label: "My Patients", path: "/dashboard/patients" },
-        { icon: Stethoscope, label: "Availability", path: "/dashboard/availability" },
+        {
+          icon: Stethoscope,
+          label: "Availability",
+          path: "/dashboard/availability",
+        },
         { icon: FileText, label: "Reports", path: "/dashboard/reports" },
       ];
     }
@@ -68,7 +81,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
       <aside
         className={`fixed lg:static top-0 left-0 h-full md:h-auto w-64 bg-white shadow-lg transform transition-transform duration-300 z-50
-        ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
+        ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0 flex flex-col justify-between`}
       >
         <nav className="p-4 space-y-2">
           {sidebarItems.map((item, index) => (
@@ -98,6 +111,13 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             <span>Logout</span>
           </button>
         </nav>
+        <div className="flex items-center space-x-2 mb-4 ml-4">
+          <User className="w-5 h-5 text-gray-600" />
+          <div className="text-sm">
+            <div className="font-medium text-gray-900">{user?.email}</div>
+            <div className="text-gray-500 capitalize">{user?.role}</div>
+          </div>
+        </div>
       </aside>
     </>
   );

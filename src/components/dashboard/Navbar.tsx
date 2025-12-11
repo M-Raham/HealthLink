@@ -1,4 +1,4 @@
-import { LogOut, Menu, User } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface NavbarProps {
@@ -6,7 +6,7 @@ interface NavbarProps {
 }
 
 const Navbar = ({ onMenuClick }: NavbarProps) => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -20,13 +20,6 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
 
         {/* User info and logout */}
         <div className="hidden lg:flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <User className="w-5 h-5 text-gray-600" />
-            <div className="text-sm">
-              <div className="font-medium text-gray-900">{user?.email}</div>
-              <div className="text-gray-500 capitalize">{user?.role}</div>
-            </div>
-          </div>
           <button
             onClick={handleLogout}
             className="flex items-center text-gray-600 hover:text-gray-900"

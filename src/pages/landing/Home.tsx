@@ -75,7 +75,6 @@ const HealthLinkDMS: React.FC = () => {
 
   const handleJoinUs = () => navigate("/signup");
   const ourServices = () => navigate("/services");
-  const goLogin      = () => navigate("/login");
 
   return (
     <div className="min-h-screen bg-white">
@@ -98,12 +97,6 @@ const HealthLinkDMS: React.FC = () => {
               HealthLink DMS. Your comprehensive solution for efficient hospital
               administration.
             </p>
-            <button
-              onClick={() => goLogin()}
-              className="bg-blue-600 text-white px-8 py-3 rounded-md text-lg font-semibold hover:bg-blue-700 transition duration-200"
-            >
-              Login to Dashboard
-            </button>
           </div>
         </div>
 

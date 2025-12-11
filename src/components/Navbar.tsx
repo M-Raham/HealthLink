@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react"; // install: npm install lucide-react
+import { LogIn, Menu, X } from "lucide-react"; // install: npm install lucide-react
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,13 +48,7 @@ const Navbar = () => {
               to="/login"
               className="px-4 py-2 text-gray-700 hover:text-blue-600 font-medium"
             >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
-            >
-              Sign Up
+              <LogIn/>
             </Link>
           </div>
 
