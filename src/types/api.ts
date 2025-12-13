@@ -23,10 +23,12 @@ export interface PaginationResponse<T> {
 
 // User & Authentication Types
 export interface User {
-  id: string;
+  id?: string;
+
   email: string;
-  role: 'admin' | 'doctor';
+  role: "admin" | "doctor";
   doctorProfile?: DoctorProfile;
+  doctorId?: string;
 }
 
 export interface LoginRequest {
@@ -42,6 +44,7 @@ export interface LoginResponse {
 // Doctor Types
 export interface DoctorProfile {
   id: string;
+  _id: string;
   name: string;
   specialization: string;
   phone: string;
@@ -64,7 +67,14 @@ export interface CreateDoctorRequest {
 }
 
 export interface Availability {
-  day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  day:
+    | "Monday"
+    | "Tuesday"
+    | "Wednesday"
+    | "Thursday"
+    | "Friday"
+    | "Saturday"
+    | "Sunday";
   startTime: string;
   endTime: string;
   isAvailable: boolean;
@@ -77,7 +87,7 @@ export interface Patient {
   email: string;
   phone: string;
   age: number;
-  gender: 'Male' | 'Female' | 'Other';
+  gender: "Male" | "Female" | "Other";
   description?: string;
   medicalHistory: MedicalRecord[];
   createdAt: string;
@@ -110,7 +120,7 @@ export interface Appointment {
   doctor: DoctorProfile;
   appointmentDate: string;
   timeSlot: string;
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  status: "pending" | "confirmed" | "completed" | "cancelled";
   reason: string;
   notes?: string;
   createdAt: string;
@@ -122,7 +132,7 @@ export interface BookAppointmentRequest {
   patientEmail: string;
   patientPhone: string;
   patientAge: number;
-  patientGender: 'Male' | 'Female' | 'Other';
+  patientGender: "Male" | "Female" | "Other";
   patientDescription?: string;
   doctorId: string;
   appointmentDate: string;
@@ -131,7 +141,7 @@ export interface BookAppointmentRequest {
 }
 
 export interface UpdateAppointmentRequest {
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  status: "pending" | "confirmed" | "completed" | "cancelled";
   notes?: string;
 }
 
@@ -155,21 +165,21 @@ export interface DoctorStats {
 
 // Specializations
 export const SPECIALIZATIONS = [
-  'Cardiology',
-  'Dermatology',
-  'Endocrinology',
-  'Gastroenterology',
-  'Neurology',
-  'Oncology',
-  'Orthopedics',
-  'Pediatrics',
-  'Psychiatry',
-  'Radiology',
-  'General Medicine',
-  'Gynecology',
-  'Ophthalmology',
-  'ENT',
-  'Urology'
+  "Cardiology",
+  "Dermatology",
+  "Endocrinology",
+  "Gastroenterology",
+  "Neurology",
+  "Oncology",
+  "Orthopedics",
+  "Pediatrics",
+  "Psychiatry",
+  "Radiology",
+  "General Medicine",
+  "Gynecology",
+  "Ophthalmology",
+  "ENT",
+  "Urology",
 ] as const;
 
-export type Specialization = typeof SPECIALIZATIONS[number];
+export type Specialization = (typeof SPECIALIZATIONS)[number];

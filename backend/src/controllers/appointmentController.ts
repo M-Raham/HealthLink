@@ -235,6 +235,28 @@ export const getAllAppointments = async (req: Request, res: Response) => {
   }
 };
 
+export const getAppointmentsByDoctor = async (req: Request, res: Response) => {
+  try {
+    const { doctorId } = req.params;
+
+    const appointments = await Appointment.find({ doctor: doctorId })
+      .populate('patient', 'name email phone medicalHistory')
+      .populate('doctor', 'name specialization');
+
+    res.status(200).json({
+      success: true,
+      data: { appointments },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching appointments',
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+};
+
+
 const generateTimeSlots = (startTime: string, endTime: string): string[] => {
   const slots: string[] = [];
   const start = new Date(`2000-01-01T${startTime}:00`);

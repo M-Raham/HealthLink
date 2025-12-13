@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Eye, RefreshCw, Calendar, X } from "lucide-react";
 import { adminService } from "../../../services";
+import { authService } from "../../../services/authService";
 import { Appointment } from "../../../types/api";
 import { LoadingSpinner } from "../../../components/common/LoadingSpinner";
 import { ErrorMessage } from "../../../components/common/ErrorMessage";
@@ -10,7 +11,7 @@ const AppointmentsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // For modal
+  // Modal state
   const [selectedMedicalHistory, setSelectedMedicalHistory] = useState<
     Appointment["patient"]["medicalHistory"] | null
   >(null);
@@ -22,9 +23,26 @@ const AppointmentsPage: React.FC = () => {
   const loadAppointments = async () => {
     setLoading(true);
     setError(null);
+
     try {
-      const res = await adminService.getAllAppointments();
-      setAppointments(res.appointments || []);
+      // Fetch current user profile from API
+      const currentUser = await authService.getProfile();
+
+      let fetchedAppointments: Appointment[] = [];
+
+      if (currentUser.role === "admin") {
+        const res = await adminService.getAllAppointments();
+        fetchedAppointments = res.appointments || [];
+      } else if (currentUser.role === "doctor" && currentUser.doctorProfile) {
+  const res = await adminService.getAppointmentsByDoctor(
+    currentUser.doctorProfile._id  // <-- use _id here
+  );
+  fetchedAppointments = res.appointments || [];
+}else {
+        throw new Error("Invalid user role or missing doctor profile");
+      }
+
+      setAppointments(fetchedAppointments);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to load appointments"
@@ -57,7 +75,7 @@ const AppointmentsPage: React.FC = () => {
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">All Appointments</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
           <button
             onClick={loadAppointments}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
@@ -66,6 +84,7 @@ const AppointmentsPage: React.FC = () => {
             Refresh
           </button>
         </div>
+
         {/* Appointments Table */}
         <div className="bg-white rounded-lg shadow overflow-x-auto">
           {appointments.length === 0 ? (
@@ -161,6 +180,7 @@ const AppointmentsPage: React.FC = () => {
           )}
         </div>
       </div>
+
       {/* Modal */}
       {selectedMedicalHistory && (
         <div className="fixed inset-0 w-screen h-screen bg-black bg-opacity-50 flex items-center justify-center z-50">

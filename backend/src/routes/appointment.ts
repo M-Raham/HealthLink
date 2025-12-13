@@ -3,7 +3,8 @@ import {
   bookAppointment,
   getAvailableDoctors,
   getDoctorAvailability,
-  getAllAppointments 
+  getAllAppointments,
+  getAppointmentsByDoctor 
 } from '../controllers/appointmentController';
 import { validateAppointmentBooking } from '../middleware/validation';
 
@@ -13,5 +14,6 @@ router.post('/book', validateAppointmentBooking, bookAppointment);
 router.get('/doctors', getAvailableDoctors);
 router.get('/doctors/:doctorId/availability', getDoctorAvailability);
 router.get('/appointments', getAllAppointments);
+router.get('/doctor/:doctorId/appointments', getAppointmentsByDoctor);
 
 export default router;
