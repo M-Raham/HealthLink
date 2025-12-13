@@ -149,6 +149,26 @@ export const getAllPatients = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
+export const getAllAppointments = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const appointments = await Appointment.find()
+      .populate('patient', 'name email phone medicalHistory')
+      .populate('doctor', 'name specialization')
+      .sort({ appointmentDate: -1 }); // latest first
+
+    res.status(200).json({
+      success: true,
+      data: { appointments }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching appointments',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+};
+
 export const toggleDoctorStatus = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { doctorId } = req.params;
@@ -189,7 +209,7 @@ export const getDashboardStats = async (req: AuthRequest, res: Response): Promis
     const completedAppointments = await Appointment.countDocuments({ status: 'completed' });
 
     const recentAppointments = await Appointment.find()
-      .populate('patient', 'name email')
+      .populate('patient', 'name email medicalHistory')
       .populate('doctor', 'name specialization')
       .sort({ createdAt: -1 })
       .limit(5);

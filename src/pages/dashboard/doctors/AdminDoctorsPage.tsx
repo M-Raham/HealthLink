@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, UserCheck, UserX, Eye, Edit } from 'lucide-react';
+import { Search, Plus, UserCheck, UserX} from 'lucide-react';
 import { adminService } from '../../../services';
 import { DoctorProfile, CreateDoctorRequest, SPECIALIZATIONS } from '../../../types/api';
 import { LoadingSpinner } from '../../../components/common/LoadingSpinner';
