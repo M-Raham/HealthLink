@@ -46,6 +46,7 @@ export interface DoctorProfile {
   id: string;
   _id: string;
   name: string;
+  email: string;
   specialization: string;
   phone: string;
   experience: number;
@@ -54,6 +55,10 @@ export interface DoctorProfile {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  user: {
+  _id: string;
+  email: string;
+};
 }
 
 export interface CreateDoctorRequest {

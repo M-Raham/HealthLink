@@ -1,30 +1,45 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Plus, UserCheck, UserX} from 'lucide-react';
-import { adminService } from '../../../services';
-import { DoctorProfile, CreateDoctorRequest, SPECIALIZATIONS } from '../../../types/api';
-import { LoadingSpinner } from '../../../components/common/LoadingSpinner';
-import { ErrorMessage } from '../../../components/common/ErrorMessage';
-import { useApi } from '../../../hooks/useApi';
+import React, { useEffect, useState } from "react";
+import {
+  Search,
+  Plus,
+  UserX,
+  Edit2,
+  Eye,
+  EyeOff,
+  Mail,
+  Phone,
+} from "lucide-react";
+import { adminService } from "../../../services";
+import {
+  DoctorProfile,
+  CreateDoctorRequest,
+  SPECIALIZATIONS,
+} from "../../../types/api";
+import { LoadingSpinner } from "../../../components/common/LoadingSpinner";
 
 const AdminDoctorsPage: React.FC = () => {
   const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingDoctor, setEditingDoctor] = useState<DoctorProfile | null>(
+    null
+  );
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [formData, setFormData] = useState<CreateDoctorRequest>({
-    email: '',
-    password: '',
-    name: '',
-    specialization: 'General Medicine',
-    phone: '',
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    specialization: "General Medicine",
+    phone: "",
     experience: 0,
-    qualification: ''
+    qualification: "",
   });
 
-  const { execute: createDoctor, loading: creating } = useApi(adminService.createDoctor);
-  const { execute: toggleStatus } = useApi(adminService.toggleDoctorStatus);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     loadDoctors();
@@ -32,297 +47,381 @@ const AdminDoctorsPage: React.FC = () => {
 
   const loadDoctors = async () => {
     setLoading(true);
-    setError(null);
     try {
-      const response = await adminService.getAllDoctors(1, 50);
-      setDoctors(response.data.doctors || []);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to load doctors');
+      const res = await adminService.getAllDoctors(1, 50);
+      setDoctors(res.data.doctors || []);
+    } catch (err) {
+      setError("Failed to load doctors");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateDoctor = async () => {
-    try {
-      await createDoctor(formData);
-      setIsModalOpen(false);
-      resetForm();
-      loadDoctors();
-    } catch (error) {
-      // Error handled by useApi hook
-    }
-  };
+  /* =========================
+     MODAL HANDLERS
+  ========================== */
 
-  const handleToggleStatus = async (doctorId: string) => {
-    try {
-      await toggleStatus(doctorId);
-      loadDoctors();
-    } catch (error) {
-      // Error handled by useApi hook
-    }
-  };
-
-  const resetForm = () => {
+  const openCreateModal = () => {
+    setEditingDoctor(null);
     setFormData({
-      email: '',
-      password: '',
-      name: '',
-      specialization: 'General Medicine',
-      phone: '',
+      email: "",
+      password: "",
+      name: "",
+      specialization: "General Medicine",
+      phone: "",
       experience: 0,
-      qualification: ''
+      qualification: "",
     });
+    setFormErrors({});
+    setShowPassword(false);
+    setIsModalOpen(true);
   };
 
-  const filteredDoctors = doctors.filter(doctor =>
-    doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doctor.specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doctor.qualification.toLowerCase().includes(searchQuery.toLowerCase())
+  const openEditModal = (doctor: DoctorProfile) => {
+    setEditingDoctor(doctor);
+    setFormData({
+      email: doctor.user?.email || "",
+      password: "",
+      name: doctor.name || "",
+      specialization: doctor.specialization || "General Medicine",
+      phone: doctor.phone || "",
+
+      experience: doctor.experience ?? 0,
+      qualification: doctor.qualification || "",
+    });
+    setFormErrors({});
+    setShowPassword(false);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingDoctor(null);
+    setFormErrors({});
+  };
+
+  /* =========================
+     VALIDATION
+  ========================== */
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    const name = formData.name.trim();
+    const email = formData.email.trim();
+    const phone = formData.phone.trim();
+    const qualification = formData.qualification.trim();
+    const password = formData.password;
+
+    if (!name) errors.name = "Name is required";
+
+    if (!email) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = "Invalid email address";
+    }
+
+    if (!phone) errors.phone = "Phone is required";
+    if (!qualification) errors.qualification = "Qualification is required";
+
+    if (!editingDoctor && !password) {
+      errors.password = "Password is required";
+    }
+
+    if (password && password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  /* =========================
+     SAVE
+  ========================== */
+
+  const handleSaveDoctor = async () => {
+    if (!validateForm()) return;
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const payload: CreateDoctorRequest | any = {
+        email: formData.email.trim(),
+        name: formData.name.trim(),
+        specialization: formData.specialization,
+        phone: formData.phone.trim(),
+        experience: formData.experience,
+        qualification: formData.qualification.trim(),
+      };
+
+      if (formData.password.trim()) {
+        payload.password = formData.password.trim();
+      }
+
+      if (editingDoctor) {
+        await adminService.updateDoctor(editingDoctor._id, payload);
+      } else {
+        await adminService.createDoctor(payload);
+      }
+
+      closeModal();
+      await loadDoctors();
+    } catch (err) {
+      setError("Failed to save doctor");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeactivateDoctor = async (id: string) => {
+    if (!confirm("Are you sure you want to deactivate this doctor?")) return;
+
+    try {
+      await adminService.deleteDoctor(id);
+      await loadDoctors();
+    } catch {
+      setError("Failed to deactivate doctor");
+    }
+  };
+
+  /* =========================
+     FILTER
+  ========================== */
+
+  const filteredDoctors = doctors.filter(
+    (d) =>
+      d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.qualification.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.user?.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex justify-center py-20">
         <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <ErrorMessage 
-        message={error} 
-        onRetry={loadDoctors}
-        className="m-6"
-      />
-    );
-  }
-
   return (
     <div className="p-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Doctor Management</h1>
-          <p className="text-gray-600">Manage doctor accounts and permissions</p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search doctors..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Doctor</span>
-          </button>
-        </div>
+      {/* HEADER */}
+      <div className="flex justify-between mb-6">
+        <h1 className="text-2xl font-bold">Doctor Management</h1>
+        <button
+          onClick={openCreateModal}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg"
+        >
+          <Plus size={16} /> Add Doctor
+        </button>
       </div>
 
-      {/* Doctors Grid */}
+      {/* SEARCH */}
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+        <input
+          className="w-full pl-10 pr-4 py-2 border rounded-lg"
+          placeholder="Search doctors..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {/* GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDoctors.map((doctor) => (
-          <div key={doctor.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">{doctor.name}</h3>
-                <p className="text-sm text-blue-600 mb-2">{doctor.specialization}</p>
-                <p className="text-sm text-gray-600">{doctor.experience} years experience</p>
-              </div>
-              <div className="flex items-center">
-                {doctor.isActive ? (
-                  <span className="inline-flex px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                    Active
-                  </span>
-                ) : (
-                  <span className="inline-flex px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-                    Inactive
-                  </span>
-                )}
-              </div>
-            </div>
+          <div
+            key={doctor._id}
+            className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
+          >
+            {/* Decorative gradient bar */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500"></div>
 
-            <div className="space-y-2 mb-4">
-              <p className="text-sm text-gray-600">
-                <strong>Phone:</strong> {doctor.phone}
-              </p>
-              <p className="text-sm text-gray-600">
-                <strong>Qualification:</strong> {doctor.qualification}
-              </p>
-            </div>
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                    {doctor.name}
+                  </h3>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                    {doctor.specialization}
+                  </div>
+                </div>
+                <button
+                  onClick={() => openEditModal(doctor)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Edit doctor"
+                >
+                  <Edit2
+                    size={18}
+                    className="text-gray-600 hover:text-blue-600"
+                  />
+                </button>
+              </div>
 
-            <div className="flex gap-2">
+              {/* Doctor Details */}
+              <div className="space-y-3 mb-5">
+                <div className="flex items-start gap-2 text-sm">
+                  <Mail
+                    size={16}
+                    className="text-gray-400 mt-0.5 flex-shrink-0"
+                  />
+                  <span className="text-gray-700 break-all">
+                    {doctor.user?.email}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone size={16} className="text-gray-400 flex-shrink-0" />
+                  <span className="text-gray-700">{doctor.phone}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-xs text-gray-500 mb-1">Experience</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {doctor.experience} years
+                    </p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-xs text-gray-500 mb-1">Qualification</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      {doctor.qualification}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Deactivate Button */}
               <button
-                onClick={() => handleToggleStatus(doctor.id)}
-                className={`flex-1 flex items-center justify-center space-x-2 px-3 py-2 rounded-lg transition-colors text-sm ${
-                  doctor.isActive
-                    ? 'bg-red-50 text-red-700 hover:bg-red-100'
-                    : 'bg-green-50 text-green-700 hover:bg-green-100'
-                }`}
+                onClick={() => handleDeactivateDoctor(doctor._id)}
+                className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 py-2.5 rounded-lg transition-colors font-medium text-sm"
               >
-                {doctor.isActive ? <UserX className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
-                <span>{doctor.isActive ? 'Deactivate' : 'Activate'}</span>
+                <UserX size={16} />
+                Deactivate Doctor
               </button>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Empty State */}
-      {filteredDoctors.length === 0 && (
-        <div className="text-center py-12">
-          <UserCheck className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-lg font-medium text-gray-900 mb-2">No doctors found</p>
-          <p className="text-gray-600 mb-4">
-            {searchQuery ? 'Try adjusting your search criteria' : 'Get started by adding your first doctor'}
-          </p>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Add Doctor
-          </button>
-        </div>
-      )}
-
-      {/* Create Doctor Modal */}
+      {/* MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setIsModalOpen(false)} />
-          
-          <div className="relative bg-white rounded-lg shadow-lg w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Add New Doctor</h2>
-              <p className="text-sm text-gray-600">Create a new doctor account</p>
-            </div>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white w-full max-w-md rounded-lg p-6">
+            <h2 className="text-lg font-semibold mb-4">
+              {editingDoctor ? "Edit Doctor" : "Add Doctor"}
+            </h2>
 
-            <div className="px-6 py-4 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name *
-                </label>
+            {/* FORM */}
+            {[
+              { label: "Full Name", key: "name" },
+              { label: "Email", key: "email", type: "email" },
+              { label: "Phone", key: "phone" },
+              { label: "Qualification", key: "qualification" },
+            ].map(({ label, key, type }) => (
+              <div key={key} className="mb-3">
+                <label className="text-sm">{label}</label>
                 <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Dr. John Smith"
+                  type={type || "text"}
+                  value={(formData as any)[key]}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, [key]: e.target.value }))
+                  }
+                  className="w-full border px-3 py-2 rounded-lg"
                 />
+                {formErrors[key] && (
+                  <p className="text-red-600 text-sm">{formErrors[key]}</p>
+                )}
               </div>
+            ))}
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="doctor@healthlink.com"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password *
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Secure password"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Specialization *
-                </label>
-                <select
-                  value={formData.specialization}
-                  onChange={(e) => setFormData(prev => ({ ...prev, specialization: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {SPECIALIZATIONS.map(spec => (
-                    <option key={spec} value={spec}>{spec}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone *
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="+1234567890"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Experience (years) *
-                </label>
-                <input
-                  type="number"
-                  value={formData.experience}
-                  onChange={(e) => setFormData(prev => ({ ...prev, experience: parseInt(e.target.value) || 0 }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  min="0"
-                  max="50"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Qualification *
-                </label>
-                <input
-                  type="text"
-                  value={formData.qualification}
-                  onChange={(e) => setFormData(prev => ({ ...prev, qualification: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="MBBS, MD"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+            {/* Specialization */}
+            <div className="mb-3">
+              <label className="text-sm font-medium text-gray-700">
+                Specialization
+              </label>
+              <select
+                value={formData.specialization}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    specialization: e.target.value,
+                  }))
+                }
+                className="w-full border px-3 py-2 rounded-lg"
               >
+                {SPECIALIZATIONS.map((spec) => (
+                  <option key={spec} value={spec}>
+                    {spec}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Experience */}
+            <div className="mb-3">
+              <label className="text-sm font-medium text-gray-700">
+                Experience (years) *
+              </label>
+              <input
+                type="number"
+                min={0}
+                max={60}
+                value={formData.experience}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    experience: Number(e.target.value) || 0,
+                  }))
+                }
+                className="w-full border px-3 py-2 rounded-lg"
+              />
+            </div>
+
+            {/* PASSWORD */}
+            <div className="mb-3">
+              <label className="text-sm">
+                {editingDoctor ? "Change Password" : "Password"}
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, password: e.target.value }))
+                  }
+                  className="w-full border px-3 py-2 rounded-lg pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((p) => !p)}
+                  className="absolute right-3 top-2.5"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              {formErrors.password && (
+                <p className="text-red-600 text-sm">{formErrors.password}</p>
+              )}
+            </div>
+
+            {/* ACTIONS */}
+            <div className="flex justify-end gap-3 mt-6">
+              <button onClick={closeModal} className="px-4 py-2 border rounded">
                 Cancel
               </button>
               <button
-                onClick={handleCreateDoctor}
-                disabled={creating}
-                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-70 flex items-center"
+                onClick={handleSaveDoctor}
+                disabled={saving}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
               >
-                {creating ? (
-                  <>
-                    <LoadingSpinner size="sm" className="mr-2" />
-                    Creating...
-                  </>
-                ) : (
-                  'Create Doctor'
-                )}
+                {saving ? "Saving..." : "Save"}
               </button>
             </div>
           </div>

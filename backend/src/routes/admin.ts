@@ -5,7 +5,9 @@ import {
   getAllPatients,
   toggleDoctorStatus,
   getDashboardStats,
-  getAllAppointments
+  getAllAppointments,
+  updateDoctor,
+  deleteDoctor
 } from '../controllers/adminController';
 import { authenticate, authorize } from '../middleware/auth';
 import { validateDoctorCreation } from '../middleware/validation';
@@ -17,6 +19,9 @@ router.use(authorize('admin'));
 
 router.get('/appointments', getAllAppointments);
 router.post('/doctors', validateDoctorCreation, createDoctor);
+router.patch('/doctors/:doctorId', updateDoctor);
+router.delete("/doctors/:doctorId", deleteDoctor);
+
 router.get('/doctors', getAllDoctors);
 router.get('/patients', getAllPatients);
 router.patch('/doctors/:doctorId/toggle-status', toggleDoctorStatus);

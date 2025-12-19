@@ -66,6 +66,35 @@ class AdminService {
     throw new Error(response.message || "Failed to toggle doctor status");
   }
 
+  async updateDoctor(
+    doctorId: string,
+    doctorData: any
+  ): Promise<DoctorProfile> {
+    const response = await apiService.patch<ApiResponse<DoctorProfile>>(
+      `/admin/doctors/${doctorId}`,
+      doctorData
+    );
+
+    if (response.success && response.data) {
+      return response.data;
+    }
+
+    throw new Error(response.message || "Failed to update doctor");
+  }
+
+  // Delete doctor
+  async deleteDoctor(doctorId: string): Promise<{ message: string }> {
+    const response = await apiService.delete<ApiResponse<{ message: string }>>(
+      `/admin/doctors/${doctorId}`
+    );
+
+    if (response.success && response.data) {
+      return response.data;
+    }
+
+    throw new Error(response.message || "Failed to delete doctor");
+  }
+
   async getAllAppointments(): Promise<{ appointments: Appointment[] }> {
     const response = await apiService.get<
       ApiResponse<{ appointments: Appointment[] }>
