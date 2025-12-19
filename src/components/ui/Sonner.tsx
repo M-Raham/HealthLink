@@ -18,9 +18,16 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       toastOptions={{
-        classNames: {
-          toast:
-            "bg-white text-black border border-gray-200 shadow-lg rounded-md min-h-[64px] px-4 py-3 flex items-center",
+        style: {
+          background: "white", // ensures background is always white
+          color: "black",       // ensures text is black
+          border: "1px solid #E5E7EB", // optional: gray border
+          minHeight: "64px",
+          padding: "0.75rem 1rem",
+          display: "flex",
+          alignItems: "center",
+          borderRadius: "0.5rem",
+          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
         },
       }}
       icons={{

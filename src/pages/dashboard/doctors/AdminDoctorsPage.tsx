@@ -16,6 +16,7 @@ import {
   SPECIALIZATIONS,
 } from "../../../types/api";
 import { LoadingSpinner } from "../../../components/common/LoadingSpinner";
+import { toast } from "sonner";
 
 const AdminDoctorsPage: React.FC = () => {
   const [doctors, setDoctors] = useState<DoctorProfile[]>([]);
@@ -52,6 +53,7 @@ const AdminDoctorsPage: React.FC = () => {
       setDoctors(res.data.doctors || []);
     } catch (err) {
       setError("Failed to load doctors");
+      toast.error("Failed to load doctors");
     } finally {
       setLoading(false);
     }
@@ -85,7 +87,6 @@ const AdminDoctorsPage: React.FC = () => {
       name: doctor.name || "",
       specialization: doctor.specialization || "General Medicine",
       phone: doctor.phone || "",
-
       experience: doctor.experience ?? 0,
       qualification: doctor.qualification || "",
     });
@@ -162,14 +163,17 @@ const AdminDoctorsPage: React.FC = () => {
 
       if (editingDoctor) {
         await adminService.updateDoctor(editingDoctor._id, payload);
+        toast.success("Doctor updated successfully");
       } else {
         await adminService.createDoctor(payload);
+        toast.success("Doctor added successfully");
       }
 
       closeModal();
       await loadDoctors();
     } catch (err) {
       setError("Failed to save doctor");
+      toast.error("Failed to save doctor");
     } finally {
       setSaving(false);
     }
@@ -180,9 +184,11 @@ const AdminDoctorsPage: React.FC = () => {
 
     try {
       await adminService.deleteDoctor(id);
+      toast.success("Doctor deactivated successfully");
       await loadDoctors();
     } catch {
       setError("Failed to deactivate doctor");
+      toast.error("Failed to deactivate doctor");
     }
   };
 
@@ -237,11 +243,9 @@ const AdminDoctorsPage: React.FC = () => {
             key={doctor._id}
             className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
           >
-            {/* Decorative gradient bar */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500"></div>
 
             <div className="p-6">
-              {/* Header */}
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
@@ -264,7 +268,6 @@ const AdminDoctorsPage: React.FC = () => {
                 </button>
               </div>
 
-              {/* Doctor Details */}
               <div className="space-y-3 mb-5">
                 <div className="flex items-start gap-2 text-sm">
                   <Mail
@@ -297,13 +300,12 @@ const AdminDoctorsPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Deactivate Button */}
               <button
                 onClick={() => handleDeactivateDoctor(doctor._id)}
                 className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 py-2.5 rounded-lg transition-colors font-medium text-sm"
               >
                 <UserX size={16} />
-                Deactivate Doctor
+                Delete Doctor
               </button>
             </div>
           </div>
@@ -318,7 +320,6 @@ const AdminDoctorsPage: React.FC = () => {
               {editingDoctor ? "Edit Doctor" : "Add Doctor"}
             </h2>
 
-            {/* FORM */}
             {[
               { label: "Full Name", key: "name" },
               { label: "Email", key: "email", type: "email" },
@@ -341,7 +342,6 @@ const AdminDoctorsPage: React.FC = () => {
               </div>
             ))}
 
-            {/* Specialization */}
             <div className="mb-3">
               <label className="text-sm font-medium text-gray-700">
                 Specialization
@@ -364,7 +364,6 @@ const AdminDoctorsPage: React.FC = () => {
               </select>
             </div>
 
-            {/* Experience */}
             <div className="mb-3">
               <label className="text-sm font-medium text-gray-700">
                 Experience (years) *
@@ -384,7 +383,6 @@ const AdminDoctorsPage: React.FC = () => {
               />
             </div>
 
-            {/* PASSWORD */}
             <div className="mb-3">
               <label className="text-sm">
                 {editingDoctor ? "Change Password" : "Password"}
@@ -411,7 +409,6 @@ const AdminDoctorsPage: React.FC = () => {
               )}
             </div>
 
-            {/* ACTIONS */}
             <div className="flex justify-end gap-3 mt-6">
               <button onClick={closeModal} className="px-4 py-2 border rounded">
                 Cancel

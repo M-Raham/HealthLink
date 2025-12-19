@@ -44,7 +44,7 @@ const DoctorSchema: Schema = new Schema({
   phone: {
     type: String,
     required: [true, 'Phone number is required'],
-    match: [/^[\+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number']
+    match: [/^(0[0-9]{10}|\+92[0-9]{10})$/, 'Invalid phone number']
   },
   experience: {
     type: Number,
