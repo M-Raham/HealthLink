@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Users, Plus, FileText } from 'lucide-react';
+import { Search, Users, Plus, FileText, Edit } from 'lucide-react';
 import { doctorService } from '../../../services';
 import { Patient, AddMedicalRecordRequest } from '../../../types/api';
 import { LoadingSpinner } from '../../../components/common/LoadingSpinner';
@@ -14,6 +14,8 @@ const DoctorPatientsPage: React.FC = () => {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddRecordOpen, setIsAddRecordOpen] = useState(false);
+  const [isEditRecordOpen, setIsEditRecordOpen] = useState(false);
+  const [editingRecordIndex, setEditingRecordIndex] = useState<number | null>(null);
 
   const [recordData, setRecordData] = useState<AddMedicalRecordRequest>({
     disease: '',
@@ -22,6 +24,7 @@ const DoctorPatientsPage: React.FC = () => {
   });
 
   const { execute: addRecord, loading: addingRecord } = useApi(doctorService.addPatientRecord);
+  const { execute: updateRecord, loading: updatingRecord } = useApi(doctorService.updatePatientRecord); // Assuming service exists
 
   useEffect(() => {
     loadPatients();
@@ -47,16 +50,34 @@ const DoctorPatientsPage: React.FC = () => {
 
   const handleAddRecord = (patient: Patient) => {
     setSelectedPatient(patient);
+    setRecordData({ disease: '', diagnosis: '', treatment: '' });
     setIsAddRecordOpen(true);
+  };
+
+  const handleEditRecord = (patient: Patient, index: number) => {
+    setSelectedPatient(patient);
+    setEditingRecordIndex(index);
+    const record = patient.medicalHistory[index];
+    setRecordData({ disease: record.disease, diagnosis: record.diagnosis, treatment: record.treatment });
+    setIsEditRecordOpen(true);
   };
 
   const handleSaveRecord = async () => {
     if (!selectedPatient) return;
 
     try {
-      await addRecord(selectedPatient._id, recordData);
+      if (isEditRecordOpen && editingRecordIndex !== null) {
+        // Update existing record
+        await updateRecord(selectedPatient._id, editingRecordIndex, recordData); // Update record API
+      } else {
+        // Add new record
+        await addRecord(selectedPatient._id, recordData);
+      }
+
       setIsAddRecordOpen(false);
+      setIsEditRecordOpen(false);
       setRecordData({ disease: '', diagnosis: '', treatment: '' });
+      setEditingRecordIndex(null);
       loadPatients(); // Refresh to get updated patient data
     } catch (error) {
       // Error handled by useApi hook
@@ -272,9 +293,21 @@ const DoctorPatientsPage: React.FC = () => {
                     {selectedPatient.medicalHistory.map((record, index) => (
                       <div key={index} className="bg-gray-50 rounded-lg p-4">
                         <div className="grid grid-cols-1 gap-3">
-                          <div>
-                            <p className="text-sm font-medium text-gray-600">Disease</p>
-                            <p className="text-sm text-gray-900">{record.disease}</p>
+                          <div className="flex justify-between">
+                            <div>
+                              <p className="text-sm font-medium text-gray-600">Disease</p>
+                              <p className="text-sm text-gray-900">{record.disease}</p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                setIsModalOpen(false);
+                                handleEditRecord(selectedPatient, index);
+                              }}
+                              className="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700"
+                            >
+                              <Edit className="w-4 h-4" />
+                              <span>Edit</span>
+                            </button>
                           </div>
                           <div>
                             <p className="text-sm font-medium text-gray-600">Diagnosis</p>
@@ -309,14 +342,16 @@ const DoctorPatientsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Add Medical Record Modal */}
-      {isAddRecordOpen && selectedPatient && (
+      {/* Add/Edit Medical Record Modal */}
+      {(isAddRecordOpen || isEditRecordOpen) && selectedPatient && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setIsAddRecordOpen(false)} />
+          <div className="absolute inset-0 bg-black/40" onClick={() => { setIsAddRecordOpen(false); setIsEditRecordOpen(false); }} />
           
           <div className="relative bg-white rounded-lg shadow-lg w-full max-w-md mx-4">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Add Medical Record</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {isEditRecordOpen ? 'Edit Medical Record' : 'Add Medical Record'}
+              </h2>
               <p className="text-sm text-gray-600">For {selectedPatient.name}</p>
             </div>
 
@@ -363,23 +398,23 @@ const DoctorPatientsPage: React.FC = () => {
 
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
               <button
-                onClick={() => setIsAddRecordOpen(false)}
+                onClick={() => { setIsAddRecordOpen(false); setIsEditRecordOpen(false); }}
                 className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveRecord}
-                disabled={addingRecord || !recordData.disease || !recordData.diagnosis || !recordData.treatment}
+                disabled={addingRecord || updatingRecord || !recordData.disease || !recordData.diagnosis || !recordData.treatment}
                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-70 flex items-center"
               >
-                {addingRecord ? (
+                {(addingRecord || updatingRecord) ? (
                   <>
                     <LoadingSpinner size="sm" className="mr-2" />
-                    Adding...
+                    Saving...
                   </>
                 ) : (
-                  'Add Record'
+                  isEditRecordOpen ? 'Update Record' : 'Add Record'
                 )}
               </button>
             </div>
