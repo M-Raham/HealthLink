@@ -54,6 +54,23 @@ class AdminService {
     throw new Error("Failed to fetch patients");
   }
 
+  // Inside AdminService class
+  async updatePatient(
+    patientId: string,
+    patientData: Partial<Patient>
+  ): Promise<Patient> {
+    const response = await apiService.patch<ApiResponse<Patient>>(
+      `/admin/patients/${patientId}`,
+      patientData
+    );
+
+    if (response.success && response.data) {
+      return response.data;
+    }
+
+    throw new Error(response.message || "Failed to update patient");
+  }
+
   async toggleDoctorStatus(doctorId: string): Promise<DoctorProfile> {
     const response = await apiService.patch<ApiResponse<DoctorProfile>>(
       `/admin/doctors/${doctorId}/toggle-status`

@@ -326,6 +326,43 @@ export const getAllPatients = async (
   }
 };
 
+export const updatePatient = async (req: AuthRequest, res: Response) => {
+  try {
+    const { patientId } = req.params;
+    const updates = req.body;
+
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      res.status(404).json({ success: false, message: "Patient not found" });
+      return;
+    }
+
+    // Only update allowed fields
+    const allowedFields = ["name", "email", "phone", "age", "gender", "description"];
+    allowedFields.forEach((field) => {
+      if (updates[field] !== undefined) {
+        (patient as any)[field] = updates[field];
+      }
+    });
+
+    await patient.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Patient updated successfully",
+      data: patient,
+    });
+  } catch (err) {
+    console.error("Update patient error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Server error updating patient",
+      error: err instanceof Error ? err.message : "Unknown error",
+    });
+  }
+};
+
+
 export const getAllAppointments = async (
   req: AuthRequest,
   res: Response
