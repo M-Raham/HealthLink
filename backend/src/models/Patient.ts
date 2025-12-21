@@ -63,7 +63,8 @@ const PatientSchema: Schema = new Schema({
     trim: true,
     maxlength: [500, 'Description cannot exceed 500 characters']
   },
-  medicalHistory: [MedicalRecordSchema]
+  medicalHistory: [MedicalRecordSchema],
+  billingAmount: { type: Number, default: 0 },
 }, {
   timestamps: true
 });

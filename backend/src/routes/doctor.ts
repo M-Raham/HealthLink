@@ -6,7 +6,8 @@ import {
   getMyPatients,
   addPatientRecord,
   getDoctorStats,
-  updatePatientRecord
+  updatePatientRecord,
+  updatePatientBilling
 } from '../controllers/doctorController';
 import { authenticate, authorize } from '../middleware/auth';
 import { validatePatientUpdate } from '../middleware/validation';
@@ -22,6 +23,7 @@ router.patch('/appointments/:appointmentId', updateAppointmentStatus);
 router.get('/patients', getMyPatients);
 router.post('/patients/:patientId/records', validatePatientUpdate, addPatientRecord);
 router.put('/patients/:patientId/records/:recordIndex', updatePatientRecord);
+router.put('/patients/:patientId/billing', updatePatientBilling);
 router.get('/stats', getDoctorStats);
 
 export default router;

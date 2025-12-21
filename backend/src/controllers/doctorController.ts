@@ -165,7 +165,7 @@ export const getMyPatients = async (
     })
       .populate(
         "patient",
-        "name email phone age gender description medicalHistory createdAt"
+        "name email phone age gender description medicalHistory billingAmount createdAt"  // Added billingAmount here!
       )
       .select("patient reason appointmentDate timeSlot status createdAt")
       .sort({ createdAt: -1 });
@@ -338,6 +338,63 @@ export const updatePatientRecord = async (
     res.status(500).json({
       success: false,
       message: "Server error updating medical record",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+};
+
+export const updatePatientBilling = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const { patientId } = req.params;
+    const { billingAmount } = req.body;
+
+    if (billingAmount === undefined || billingAmount < 0) {
+      res.status(400).json({ success: false, message: "Invalid billing amount" });
+      return;
+    }
+
+    const doctor = await Doctor.findOne({ user: req.user?.id });
+    if (!doctor) {
+      res.status(404).json({ success: false, message: "Doctor profile not found" });
+      return;
+    }
+
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      res.status(404).json({ success: false, message: "Patient not found" });
+      return;
+    }
+
+    // Ensure doctor has an appointment with this patient
+    const hasAppointment = await Appointment.findOne({
+      patient: patientId,
+      doctor: doctor._id as Types.ObjectId,
+    });
+
+    if (!hasAppointment) {
+      res.status(403).json({
+        success: false,
+        message: "You can only update billing for your patients",
+      });
+      return;
+    }
+
+    // Update billing amount
+    patient.billingAmount = billingAmount;
+    await patient.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Billing amount updated successfully",
+      data: patient,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error updating billing amount",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

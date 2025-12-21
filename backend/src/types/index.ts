@@ -40,6 +40,7 @@ export interface IPatient extends Document {
   medicalHistory: IMedicalRecord[];
   createdAt: Date;
   updatedAt: Date;
+   billingAmount?: number;
 }
 
 export interface IMedicalRecord {

@@ -102,6 +102,7 @@ export interface Patient {
   latestAppointmentDate?: string;
   totalAppointments?: number;
   appointmentReasons?: string[];
+  billingAmount?: number
 }
 
 export interface MedicalRecord {
@@ -116,6 +117,7 @@ export interface AddMedicalRecordRequest {
   disease: string;
   diagnosis: string;
   treatment: string;
+  billingAmount?: number;
 }
 
 // Appointment Types

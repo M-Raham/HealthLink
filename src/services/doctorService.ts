@@ -109,6 +109,22 @@ class DoctorService {
     throw new Error(response.message || "Failed to update medical record");
   }
 
+  async updatePatientBilling(
+    patientId: string,
+    data: { billingAmount: number }
+  ): Promise<Patient> {
+    const response = await apiService.put<ApiResponse<Patient>>(
+      `/doctor/patients/${patientId}/billing`,
+      data
+    );
+
+    if (response.success && response.data) {
+      return response.data;
+    }
+
+    throw new Error(response.message || "Failed to update billing amount");
+  }
+
   async getDoctorStats(): Promise<DoctorStats> {
     const response = await apiService.get<ApiResponse<DoctorStats>>(
       "/doctor/stats"
