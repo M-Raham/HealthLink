@@ -21,7 +21,7 @@ class AppointmentService {
   }
 
   async getAvailableDoctors(specialization?: string): Promise<DoctorProfile[]> {
-    let url = '/appointments/doctors';
+    let url = '/doctors';
     if (specialization) {
       url += `?specialization=${encodeURIComponent(specialization)}`;
     }
