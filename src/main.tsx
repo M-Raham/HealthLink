@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes";
 import { AuthProvider } from "./contexts/AuthContext";
 import "./index.css";
+import './chatbot.css' 
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

@@ -68,6 +68,5 @@ const DoctorSchema: Schema = new Schema({
 });
 
 DoctorSchema.index({ specialization: 1, isActive: 1 });
-DoctorSchema.index({ user: 1 });
 
 export default mongoose.model<IDoctor>('Doctor', DoctorSchema);

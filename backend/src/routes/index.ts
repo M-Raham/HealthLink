@@ -9,7 +9,7 @@ const router = Router();
 router.use('/auth', authRoutes);
 router.use('/admin', adminRoutes);
 router.use('/doctor', doctorRoutes);
-router.use('/', appointmentRoutes);
+router.use('/appointments', appointmentRoutes);
 
 router.get('/health', (req, res) => {
   res.status(200).json({
