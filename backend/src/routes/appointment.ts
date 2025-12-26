@@ -14,6 +14,6 @@ router.post("/book", validateAppointmentBooking, bookAppointment);
 router.get("/doctors", getAvailableDoctors);
 router.get("/doctors/:doctorId/availability", getDoctorAvailability);
 router.get("/", getAllAppointments);
-router.get("/doctor/:doctorId/appointments", getAppointmentsByDoctor);
+router.get("/doctor/:doctorId", getAppointmentsByDoctor);
 
 export default router;

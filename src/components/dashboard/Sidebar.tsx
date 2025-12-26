@@ -60,7 +60,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           label: "Availability",
           path: "/dashboard/availability",
         },
-        { icon: FileText, label: "Reports", path: "/dashboard/reports" },
       ];
     }
 

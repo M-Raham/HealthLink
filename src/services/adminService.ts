@@ -130,7 +130,7 @@ class AdminService {
   ): Promise<{ appointments: Appointment[] }> {
     const response = await apiService.get<
       ApiResponse<{ appointments: Appointment[] }>
-    >(`/doctor/${doctorId}/appointments`);
+    >(`/appointments/doctor/${doctorId}`);
 
     if (response.success && response.data) {
       return response.data;

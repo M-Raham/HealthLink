@@ -320,69 +320,123 @@ const AdminDoctorsPage: React.FC = () => {
               {editingDoctor ? "Edit Doctor" : "Add Doctor"}
             </h2>
 
-            {[
-              { label: "Full Name", key: "name" },
-              { label: "Email", key: "email", type: "email" },
-              { label: "Phone", key: "phone" },
-              { label: "Qualification", key: "qualification" },
-            ].map(({ label, key, type }) => (
-              <div key={key} className="mb-3">
-                <label className="text-sm">{label}</label>
+            {/* TWO FIELDS PER ROW */}
+            <div className="mb-3 flex gap-3">
+              {/* Full Name */}
+              <div className="flex-1">
+                <label className="text-sm">Full Name</label>
                 <input
-                  type={type || "text"}
-                  value={(formData as any)[key]}
+                  type="text"
+                  value={formData.name}
                   onChange={(e) =>
-                    setFormData((p) => ({ ...p, [key]: e.target.value }))
+                    setFormData((p) => ({ ...p, name: e.target.value }))
                   }
                   className="w-full border px-3 py-2 rounded-lg"
                 />
-                {formErrors[key] && (
-                  <p className="text-red-600 text-sm">{formErrors[key]}</p>
+                {formErrors.name && (
+                  <p className="text-red-600 text-sm">{formErrors.name}</p>
                 )}
               </div>
-            ))}
 
-            <div className="mb-3">
-              <label className="text-sm font-medium text-gray-700">
-                Specialization
-              </label>
-              <select
-                value={formData.specialization}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    specialization: e.target.value,
-                  }))
-                }
-                className="w-full border px-3 py-2 rounded-lg"
-              >
-                {SPECIALIZATIONS.map((spec) => (
-                  <option key={spec} value={spec}>
-                    {spec}
-                  </option>
-                ))}
-              </select>
+              {/* Email */}
+              <div className="flex-1">
+                <label className="text-sm">Email</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, email: e.target.value }))
+                  }
+                  className="w-full border px-3 py-2 rounded-lg"
+                />
+                {formErrors.email && (
+                  <p className="text-red-600 text-sm">{formErrors.email}</p>
+                )}
+              </div>
             </div>
 
-            <div className="mb-3">
-              <label className="text-sm font-medium text-gray-700">
-                Experience (years) *
-              </label>
-              <input
-                type="number"
-                min={0}
-                max={60}
-                value={formData.experience}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    experience: Number(e.target.value) || 0,
-                  }))
-                }
-                className="w-full border px-3 py-2 rounded-lg"
-              />
+            <div className="mb-3 flex gap-3">
+              {/* Phone */}
+              <div className="flex-1">
+                <label className="text-sm">Phone</label>
+                <input
+                  type="text"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, phone: e.target.value }))
+                  }
+                  className="w-full border px-3 py-2 rounded-lg"
+                />
+                {formErrors.phone && (
+                  <p className="text-red-600 text-sm">{formErrors.phone}</p>
+                )}
+              </div>
+
+              {/* Qualification */}
+              <div className="flex-1">
+                <label className="text-sm">Qualification</label>
+                <input
+                  type="text"
+                  value={formData.qualification}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, qualification: e.target.value }))
+                  }
+                  className="w-full border px-3 py-2 rounded-lg"
+                />
+                {formErrors.qualification && (
+                  <p className="text-red-600 text-sm">
+                    {formErrors.qualification}
+                  </p>
+                )}
+              </div>
             </div>
 
+            <div className="mb-3 flex gap-3">
+              {/* Specialization */}
+              <div className="flex-1">
+                <label className="text-sm font-medium text-gray-700">
+                  Specialization
+                </label>
+                <select
+                  value={formData.specialization}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      specialization: e.target.value,
+                    }))
+                  }
+                  className="w-full border px-3 py-2 rounded-lg"
+                >
+                  {SPECIALIZATIONS.map((spec) => (
+                    <option key={spec} value={spec}>
+                      {spec}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Experience */}
+              <div className="flex-1">
+                <label className="text-sm font-medium text-gray-700">
+                  Experience (years)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  max={60}
+                  value={formData.experience}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      experience: Number(e.target.value) || 0,
+                    }))
+                  }
+                  className="w-full border px-3 py-2 rounded-lg"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
             <div className="mb-3">
               <label className="text-sm">
                 {editingDoctor ? "Change Password" : "Password"}
@@ -410,7 +464,10 @@ const AdminDoctorsPage: React.FC = () => {
             </div>
 
             <div className="flex justify-end gap-3 mt-6">
-              <button onClick={closeModal} className="px-4 py-2 border rounded">
+              <button
+                onClick={closeModal}
+                className="px-4 py-2 border rounded"
+              >
                 Cancel
               </button>
               <button
