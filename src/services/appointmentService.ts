@@ -3,7 +3,8 @@ import {
   ApiResponse,
   BookAppointmentRequest,
   Appointment,
-  DoctorProfile
+  DoctorProfile,
+  Availability
 } from '../types/api';
 
 class AppointmentService {
@@ -40,9 +41,13 @@ class AppointmentService {
     date?: string
   ): Promise<{
     doctor: { id: string; name: string; specialization: string };
-    availability: any[];
+    availability: Availability[];
     availableSlots: string[];
   }> {
+    if (!doctorId || doctorId === 'undefined' || doctorId === '') {
+      throw new Error('Invalid doctor ID provided');
+    }
+    
     let url = `/appointments/doctors/${doctorId}/availability`;
     if (date) {
       url += `?date=${date}`;
@@ -50,7 +55,7 @@ class AppointmentService {
     
     const response = await apiService.get<ApiResponse<{
       doctor: { id: string; name: string; specialization: string };
-      availability: any[];
+      availability: Availability[];
       availableSlots: string[];
     }>>(url);
     

@@ -24,7 +24,6 @@ const AdminDoctorsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [editingDoctor, setEditingDoctor] = useState<DoctorProfile | null>(
     null
   );
@@ -51,8 +50,7 @@ const AdminDoctorsPage: React.FC = () => {
     try {
       const res = await adminService.getAllDoctors(1, 50);
       setDoctors(res.data.doctors || []);
-    } catch (err) {
-      setError("Failed to load doctors");
+    } catch {
       toast.error("Failed to load doctors");
     } finally {
       setLoading(false);
@@ -145,34 +143,42 @@ const AdminDoctorsPage: React.FC = () => {
     if (!validateForm()) return;
 
     setSaving(true);
-    setError(null);
 
     try {
-      const payload: CreateDoctorRequest | any = {
-        email: formData.email.trim(),
-        name: formData.name.trim(),
-        specialization: formData.specialization,
-        phone: formData.phone.trim(),
-        experience: formData.experience,
-        qualification: formData.qualification.trim(),
-      };
-
-      if (formData.password.trim()) {
-        payload.password = formData.password.trim();
-      }
-
       if (editingDoctor) {
-        await adminService.updateDoctor(editingDoctor._id, payload);
+        const updatePayload: Omit<CreateDoctorRequest, 'password'> & { password?: string } = {
+          email: formData.email.trim(),
+          name: formData.name.trim(),
+          specialization: formData.specialization,
+          phone: formData.phone.trim(),
+          experience: formData.experience,
+          qualification: formData.qualification.trim(),
+        };
+
+        if (formData.password.trim()) {
+          updatePayload.password = formData.password.trim();
+        }
+
+        await adminService.updateDoctor(editingDoctor._id, updatePayload);
         toast.success("Doctor updated successfully");
       } else {
-        await adminService.createDoctor(payload);
+        const createPayload: CreateDoctorRequest = {
+          email: formData.email.trim(),
+          password: formData.password.trim(),
+          name: formData.name.trim(),
+          specialization: formData.specialization,
+          phone: formData.phone.trim(),
+          experience: formData.experience,
+          qualification: formData.qualification.trim(),
+        };
+
+        await adminService.createDoctor(createPayload);
         toast.success("Doctor added successfully");
       }
 
       closeModal();
       await loadDoctors();
-    } catch (err) {
-      setError("Failed to save doctor");
+    } catch {
       toast.error("Failed to save doctor");
     } finally {
       setSaving(false);
@@ -187,7 +193,6 @@ const AdminDoctorsPage: React.FC = () => {
       toast.success("Doctor deactivated successfully");
       await loadDoctors();
     } catch {
-      setError("Failed to deactivate doctor");
       toast.error("Failed to deactivate doctor");
     }
   };

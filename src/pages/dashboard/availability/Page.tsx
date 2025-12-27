@@ -5,6 +5,7 @@ import { Availability } from "../../../types/api";
 import { LoadingSpinner } from "../../../components/common/LoadingSpinner";
 import { ErrorMessage } from "../../../components/common/ErrorMessage";
 import { useApi } from "../../../hooks/useApi";
+import { toast } from 'sonner';
 
 const DAYS_OF_WEEK = [
   "Monday",
@@ -129,17 +130,16 @@ const AvailabilityPage: React.FC = () => {
     }
 
     try {
-      console.log("Saving availability:", availability);
       const result = await updateAvailability(availability);
-      console.log("Save result:", result);
       
       if (result) {
+        toast.success('Availability saved successfully!', { id: 'availability-saved' });
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
       }
     } catch (err) {
-      console.error("Save error:", err);
       const errorMessage = err instanceof Error ? err.message : "Failed to save availability";
+      toast.error(errorMessage, { id: 'availability-error' });
       setSaveError(errorMessage);
     }
   };

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Doctor, Patient, Appointment } from '../models';
-import { AuthRequest, IAvailability, IDoctor } from '../types';
+import { IAvailability } from '../types';
+import { IDoctor } from '../types';
 
 export const bookAppointment = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -98,8 +99,8 @@ export const getAvailableDoctors = async (req: Request, res: Response): Promise<
   try {
     const { specialization } = req.query;
 
-    let query: any = { isActive: true };
-    if (specialization) {
+    const query: { isActive: boolean; specialization?: string } = { isActive: true };
+    if (specialization && typeof specialization === 'string') {
       query.specialization = specialization;
     }
 
@@ -108,7 +109,7 @@ export const getAvailableDoctors = async (req: Request, res: Response): Promise<
       .sort({ name: 1 });
 
     // Transform the data to include id field for frontend compatibility
-    const transformedDoctors = doctors.map((doctor: any) => ({
+    const transformedDoctors = doctors.map((doctor: IDoctor) => ({
       id: (doctor._id as string).toString(),
       name: doctor.name,
       specialization: doctor.specialization,

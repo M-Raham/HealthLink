@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Request } from 'express';
 
 export interface IUser extends Document {
@@ -68,6 +68,37 @@ export interface AuthRequest extends Request {
     id: string;
     role: string;
   };
+}
+
+export interface UserData {
+  id: string;
+  email: string;
+  role: 'admin' | 'doctor';
+  doctorProfile?: {
+    id: string;
+    name: string;
+    specialization: string;
+    phone: string;
+    experience: number;
+    qualification: string;
+    availability: IAvailability[];
+    isActive: boolean;
+  };
+}
+
+export interface PopulatedPatient {
+  _id: Types.ObjectId;
+  name: string;
+  email: string;
+  phone: string;
+  age: number;
+  gender: 'Male' | 'Female' | 'Other';
+  description?: string;
+  medicalHistory: IMedicalRecord[];
+  billingAmount?: number;
+  createdAt: Date;
+  updatedAt: Date;
+  toObject(): Record<string, unknown>;
 }
 
 export const SPECIALIZATIONS = [

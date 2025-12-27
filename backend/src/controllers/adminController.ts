@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { User, Doctor, Patient, Appointment } from "../models";
-import { AuthRequest } from "../types";
+import { AuthRequest, IUser } from "../types";
 import { generateToken } from "../utils/jwt";
 
 export const updateDoctor = async (
@@ -18,8 +18,6 @@ export const updateDoctor = async (
       email,
       password,
     } = req.body;
-
-    console.log('Update request body:', req.body); // Debug log
 
     const doctor = await Doctor.findById(doctorId);
     if (!doctor) {
@@ -54,7 +52,7 @@ export const updateDoctor = async (
 
     // Fetch updated doctor with user info for response
     const updatedDoctor = await Doctor.findById(doctorId).populate('user', 'email');
-    const userEmail = (updatedDoctor?.user as any)?.email || email;
+    const userEmail = (updatedDoctor?.user as unknown as IUser)?.email || email;
 
     res.status(200).json({
       success: true,
@@ -84,6 +82,8 @@ export const createDoctor = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log('Create doctor request body:', req.body); // Debug log
+    
     const {
       email,
       password,
@@ -93,8 +93,6 @@ export const createDoctor = async (
       experience,
       qualification,
     } = req.body;
-
-    console.log('Create doctor request:', { email, name, specialization }); // Debug log
 
     // Validate required fields
     if (!email || !password || !name || !specialization || !phone || !qualification) {
@@ -341,7 +339,7 @@ export const updatePatient = async (req: AuthRequest, res: Response) => {
     const allowedFields = ["name", "email", "phone", "age", "gender", "description"];
     allowedFields.forEach((field) => {
       if (updates[field] !== undefined) {
-        (patient as any)[field] = updates[field];
+        (patient as unknown as Record<string, unknown>)[field] = updates[field];
       }
     });
 

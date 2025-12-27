@@ -171,7 +171,7 @@ const AdminDashboard: React.FC = () => {
                           {appointment.patient?.name || "N/A"}
                         </p>
                         <p className="text-sm text-gray-600">
-                          with Dr. {appointment.doctor?.name || "N/A"} •{" "}
+                          with {appointment.doctor?.name || "N/A"} •{" "}
                           {appointment.doctor?.specialization || "N/A"}
                         </p>
                       </div>

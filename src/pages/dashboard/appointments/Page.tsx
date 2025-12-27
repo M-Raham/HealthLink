@@ -34,19 +34,23 @@ const AppointmentsPage: React.FC = () => {
         const res = await adminService.getAllAppointments();
         fetchedAppointments = res.appointments || [];
       } else if (currentUser.role === "doctor" && currentUser.doctorProfile) {
-  const res = await adminService.getAppointmentsByDoctor(
-    currentUser.doctorProfile._id  // <-- use _id here
-  );
-  fetchedAppointments = res.appointments || [];
-}else {
+        if (!currentUser.doctorProfile.id) {
+          throw new Error("Doctor profile ID is missing");
+        }
+        const res = await adminService.getAppointmentsByDoctor(
+          currentUser.doctorProfile.id
+        );
+        fetchedAppointments = res.appointments || [];
+      } else {
         throw new Error("Invalid user role or missing doctor profile");
       }
 
       setAppointments(fetchedAppointments);
+
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to load appointments"
-      );
+      const errorMessage = err instanceof Error ? err.message : "Failed to load appointments";
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -151,11 +155,10 @@ const AppointmentsPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                            status === "Completed"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${status === "Completed"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                            }`}
                         >
                           {status}
                         </span>

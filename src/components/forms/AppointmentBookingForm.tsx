@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, Clock, User, Mail, Phone, FileText } from 'lucide-react';
 import { appointmentService } from '../../services';
 import { DoctorProfile, SPECIALIZATIONS, BookAppointmentRequest } from '../../types/api';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorMessage } from '../common/ErrorMessage';
+import { toast } from 'sonner';
 
 interface AppointmentBookingFormProps {
   onSuccess?: () => void;
@@ -36,6 +37,48 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const loadDoctors = useCallback(async () => {
+    setLoadingDoctors(true);
+    try {
+      const doctorList = await appointmentService.getAvailableDoctors(formData.specialization);
+      setDoctors(doctorList);
+      if (doctorList.length === 0) {
+        toast.warning('No doctors available for this specialization', { id: 'no-doctors' });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load doctors';
+      toast.error(errorMessage, { id: 'doctors-error' });
+      setDoctors([]);
+    } finally {
+      setLoadingDoctors(false);
+    }
+  }, [formData.specialization]);
+
+  const loadAvailableSlots = useCallback(async () => {
+    if (!formData.doctorId || formData.doctorId === 'undefined' || formData.doctorId === '') {
+      setAvailableSlots([]);
+      return;
+    }
+    
+    setLoadingSlots(true);
+    try {
+      const availability = await appointmentService.getDoctorAvailability(
+        formData.doctorId,
+        formData.appointmentDate
+      );
+      setAvailableSlots(availability.availableSlots || []);
+      if (!availability.availableSlots || availability.availableSlots.length === 0) {
+        toast.warning('No available slots for this date. Please try another date.', { id: 'no-slots' });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load available slots';
+      toast.error(errorMessage, { id: 'slots-error' });
+      setAvailableSlots([]);
+    } finally {
+      setLoadingSlots(false);
+    }
+  }, [formData.doctorId, formData.appointmentDate]);
+
   // Load doctors when specialization changes
   useEffect(() => {
     if (formData.specialization) {
@@ -44,49 +87,17 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
       setDoctors([]);
       setFormData(prev => ({ ...prev, doctorId: '' }));
     }
-  }, [formData.specialization]);
+  }, [formData.specialization, loadDoctors]);
 
   // Load available slots when doctor and date change
   useEffect(() => {
-    if (formData.doctorId && formData.appointmentDate) {
+    if (formData.doctorId && formData.doctorId !== 'undefined' && formData.doctorId !== '' && formData.appointmentDate) {
       loadAvailableSlots();
     } else {
       setAvailableSlots([]);
       setFormData(prev => ({ ...prev, timeSlot: '' }));
     }
-  }, [formData.doctorId, formData.appointmentDate]);
-
-  const loadDoctors = async () => {
-    setLoadingDoctors(true);
-    try {
-      const doctorList = await appointmentService.getAvailableDoctors(formData.specialization);
-      console.log('Loaded doctors:', doctorList);
-      setDoctors(doctorList);
-    } catch (error) {
-      console.error('Failed to load doctors:', error);
-      setDoctors([]);
-    } finally {
-      setLoadingDoctors(false);
-    }
-  };
-
-  const loadAvailableSlots = async () => {
-    setLoadingSlots(true);
-    try {
-      console.log('Loading slots for doctor:', formData.doctorId, 'date:', formData.appointmentDate);
-      const availability = await appointmentService.getDoctorAvailability(
-        formData.doctorId,
-        formData.appointmentDate
-      );
-      console.log('Received availability:', availability);
-      setAvailableSlots(availability.availableSlots || []);
-    } catch (error) {
-      console.error('Failed to load available slots:', error);
-      setAvailableSlots([]);
-    } finally {
-      setLoadingSlots(false);
-    }
-  };
+  }, [formData.doctorId, formData.appointmentDate, loadAvailableSlots]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -114,6 +125,7 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
       };
 
       await appointmentService.bookAppointment(appointmentData);
+      toast.success('Appointment booked successfully!', { id: 'appointment-success' });
       setSuccess(true);
       
       // Reset form
@@ -135,7 +147,9 @@ export const AppointmentBookingForm: React.FC<AppointmentBookingFormProps> = ({
         onSuccess();
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to book appointment');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to book appointment';
+      toast.error(errorMessage, { id: 'appointment-error' });
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

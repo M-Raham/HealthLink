@@ -1,5 +1,5 @@
 import { LogOut, Menu } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "../../contexts/useAuth";
 
 interface NavbarProps {
   onMenuClick: () => void; // callback to toggle sidebar

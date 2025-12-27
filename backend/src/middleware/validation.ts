@@ -29,7 +29,6 @@ export const validateLogin = [
 export const validateDoctorCreation = [
   body('email')
     .isEmail()
-    .normalizeEmail()
     .withMessage('Please provide a valid email'),
   body('password')
     .isLength({ min: 6 })
@@ -42,7 +41,9 @@ export const validateDoctorCreation = [
     .isIn(SPECIALIZATIONS)
     .withMessage('Please select a valid specialization'),
   body('phone')
-    .isMobilePhone('any')
+    .isLength({ min: 10, max: 15 })
+    .withMessage('Phone number must be between 10 and 15 characters')
+    .matches(/^[+]?[\d\s\-()]+$/)
     .withMessage('Please provide a valid phone number'),
   body('experience')
     .isInt({ min: 0, max: 50 })
@@ -96,11 +97,15 @@ export const validatePatientUpdate = [
     .withMessage('Disease must be between 2 and 100 characters'),
   body('diagnosis')
     .trim()
-    .isLength({ min: 5, max: 500 })
-    .withMessage('Diagnosis must be between 5 and 500 characters'),
+    .isLength({ min: 2, max: 500 })
+    .withMessage('Diagnosis must be between 2 and 500 characters'),
   body('treatment')
     .trim()
-    .isLength({ min: 5, max: 500 })
-    .withMessage('Treatment must be between 5 and 500 characters'),
+    .isLength({ min: 2, max: 500 })
+    .withMessage('Treatment must be between 2 and 500 characters'),
+  body('billingAmount')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Billing amount must be a positive number'),
   handleValidationErrors
 ];

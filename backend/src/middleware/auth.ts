@@ -1,10 +1,27 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { verifyToken, extractTokenFromHeader } from '../utils/jwt';
 import { AuthRequest } from '../types';
 
 export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const token = extractTokenFromHeader(req.headers.authorization);
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      res.status(401).json({
+        success: false,
+        message: 'Authorization header is required'
+      });
+      return;
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      res.status(401).json({
+        success: false,
+        message: 'Authorization header must be provided in Bearer format'
+      });
+      return;
+    }
+
+    const token = authHeader.substring(7);
     const decoded = verifyToken(token);
     
     req.user = {

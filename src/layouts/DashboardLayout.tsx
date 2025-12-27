@@ -19,7 +19,13 @@ const DashboardLayout = () => {
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto p-6">
-          <Toaster />
+          <Toaster 
+            position="bottom-right"
+            richColors
+            closeButton
+            expand={false}
+            duration={4000}
+          />
           <Outlet />
         </main>
       </div>

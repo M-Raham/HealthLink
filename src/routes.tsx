@@ -11,7 +11,7 @@ import Oncology from "@pages/landing/services/Oncology";
 import Diagnostics from "@pages/landing/services/Diagnostics";
 
 import Login from "./auth/Login";
-import { useAuth } from "./contexts/AuthContext";
+import { useAuth } from "./contexts/useAuth";
 import { LoadingSpinner } from "./components/common/LoadingSpinner";
 
 import DashboardHome from "@pages/dashboard/home/Page";

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { User, Doctor } from '../models';
 import { generateToken } from '../utils/jwt';
-import { AuthRequest } from '../types';
+import { AuthRequest, UserData } from '../types';
 
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -30,7 +30,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       role: user.role
     });
 
-    let userData: any = {
+    const userData: UserData = {
       id: (user._id as string).toString(),
       email: user.email,
       role: user.role
@@ -40,9 +40,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       const doctor = await Doctor.findOne({ user: user._id });
       if (doctor) {
         userData.doctorProfile = {
-          id: doctor._id,
+          id: (doctor._id as string).toString(),
           name: doctor.name,
           specialization: doctor.specialization,
+          phone: doctor.phone,
+          experience: doctor.experience,
+          qualification: doctor.qualification,
+          availability: doctor.availability,
           isActive: doctor.isActive
         };
       }
@@ -76,7 +80,7 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    let userData: any = {
+    const userData: UserData = {
       id: (user._id as string).toString(),
       email: user.email,
       role: user.role
@@ -85,7 +89,16 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
     if (user.role === 'doctor') {
       const doctor = await Doctor.findOne({ user: user._id });
       if (doctor) {
-        userData.doctorProfile = doctor;
+        userData.doctorProfile = {
+          id: (doctor._id as string).toString(),
+          name: doctor.name,
+          specialization: doctor.specialization,
+          phone: doctor.phone,
+          experience: doctor.experience,
+          qualification: doctor.qualification,
+          availability: doctor.availability,
+          isActive: doctor.isActive
+        };
       }
     }
 

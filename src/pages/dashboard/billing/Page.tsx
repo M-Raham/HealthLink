@@ -20,11 +20,10 @@ const AdminBillingPage: React.FC = () => {
     setError(null);
     try {
       const response = await adminService.getAllPatients(1, 100);
-      console.log('Patients response:', response); // Debug log
       setPatients(response.data.patients || []);
     } catch (error) {
-      console.error('Failed to load patients', error);
-      setError(error instanceof Error ? error.message : 'Failed to load patients');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load patients';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -37,10 +36,6 @@ const AdminBillingPage: React.FC = () => {
   const billedPatients = patients.filter(
     patient => patient.billingAmount && patient.billingAmount > 0
   );
-
-  console.log('All patients:', allPatients.length); // Debug
-  console.log('Billed patients:', billedPatients.length); // Debug
-  console.log('Sample patient:', allPatients[0]); // Debug
 
   // Calculate total billing
   const totalBilling = billedPatients.reduce(

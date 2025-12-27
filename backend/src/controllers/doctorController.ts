@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { Doctor, Patient, Appointment } from "../models";
-import { AuthRequest } from "../types";
+import { AuthRequest, PopulatedPatient } from "../types";
 import { Types } from 'mongoose';
 
 export const updateAvailability = async (
@@ -55,7 +55,7 @@ export const getMyAppointments = async (
     const status = req.query.status as string;
     const skip = (page - 1) * limit;
 
-    let query: any = { doctor: doctor._id };
+    const query: { doctor: Types.ObjectId; status?: string } = { doctor: doctor._id as Types.ObjectId };
     if (
       status &&
       ["pending", "confirmed", "completed", "cancelled"].includes(status)
@@ -173,9 +173,9 @@ export const getMyPatients = async (
     // Group appointments by patient and include latest appointment reason
     const patientMap = new Map();
     appointments.forEach((appointment) => {
-      const patientId = (appointment.patient as any)._id.toString();
+      const patientId = (appointment.patient as unknown as PopulatedPatient)._id.toString();
       if (!patientMap.has(patientId)) {
-        const patientData = appointment.patient as any;
+        const patientData = appointment.patient as unknown as PopulatedPatient;
         patientMap.set(patientId, {
           ...patientData.toObject(),
           latestAppointmentReason: appointment.reason,
@@ -223,7 +223,7 @@ export const addPatientRecord = async (
 ): Promise<void> => {
   try {
     const { patientId } = req.params;
-    const { disease, diagnosis, treatment } = req.body;
+    const { disease, diagnosis, treatment, billingAmount } = req.body;
 
     const doctor = await Doctor.findOne({ user: req.user?.id });
     if (!doctor) {
@@ -264,6 +264,11 @@ export const addPatientRecord = async (
       recordedAt: new Date(),
     });
 
+    // Update billing amount if provided
+    if (billingAmount !== undefined && billingAmount >= 0) {
+      patient.billingAmount = billingAmount;
+    }
+
     await patient.save();
 
     res.status(200).json({
@@ -286,7 +291,7 @@ export const updatePatientRecord = async (
 ): Promise<void> => {
   try {
     const { patientId, recordIndex } = req.params;
-    const { disease, diagnosis, treatment } = req.body;
+    const { disease, diagnosis, treatment, billingAmount } = req.body;
 
     const doctor = await Doctor.findOne({ user: req.user?.id });
     if (!doctor) {
@@ -326,6 +331,11 @@ export const updatePatientRecord = async (
       doctorId: (doctor._id as Types.ObjectId).toString(),
       recordedAt: new Date(),
     };
+
+    // Update billing amount if provided
+    if (billingAmount !== undefined && billingAmount >= 0) {
+      patient.billingAmount = billingAmount;
+    }
 
     await patient.save();
 

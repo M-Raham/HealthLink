@@ -3,6 +3,7 @@ import {
   ApiResponse,
   PaginationResponse,
   CreateDoctorRequest,
+  User,
   DoctorProfile,
   Patient,
   AdminStats,
@@ -12,9 +13,9 @@ import {
 class AdminService {
   async createDoctor(
     doctorData: CreateDoctorRequest
-  ): Promise<{ user: any; doctor: DoctorProfile; token: string }> {
+  ): Promise<{ user: User; doctor: DoctorProfile; token: string }> {
     const response = await apiService.post<
-      ApiResponse<{ user: any; doctor: DoctorProfile; token: string }>
+      ApiResponse<{ user: User; doctor: DoctorProfile; token: string }>
     >("/admin/doctors", doctorData);
 
     if (response.success && response.data) {
@@ -85,7 +86,7 @@ class AdminService {
 
   async updateDoctor(
     doctorId: string,
-    doctorData: any
+    doctorData: Omit<CreateDoctorRequest, 'password'> & { password?: string }
   ): Promise<DoctorProfile> {
     const response = await apiService.patch<ApiResponse<DoctorProfile>>(
       `/admin/doctors/${doctorId}`,
@@ -128,6 +129,10 @@ class AdminService {
   async getAppointmentsByDoctor(
     doctorId: string
   ): Promise<{ appointments: Appointment[] }> {
+    if (!doctorId || doctorId === 'undefined' || doctorId === '') {
+      throw new Error('Invalid doctor ID provided');
+    }
+    
     const response = await apiService.get<
       ApiResponse<{ appointments: Appointment[] }>
     >(`/appointments/doctor/${doctorId}`);

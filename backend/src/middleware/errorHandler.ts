@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 
 export interface ApiError extends Error {
   statusCode?: number;
@@ -7,8 +7,7 @@ export interface ApiError extends Error {
 export const errorHandler = (
   err: ApiError,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): void => {
   let error = { ...err };
   error.message = err.message;
@@ -25,7 +24,7 @@ export const errorHandler = (
     error = { name: 'ValidationError', message, statusCode: 400 };
   }
 
-  if (err.name === 'MongoServerError' && (err as any).code === 11000) {
+  if (err.name === 'MongoServerError' && (err as ApiError & { code?: number }).code === 11000) {
     const message = 'Duplicate field value entered';
     error = { name: 'DuplicateError', message, statusCode: 400 };
   }

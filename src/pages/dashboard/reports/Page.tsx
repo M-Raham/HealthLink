@@ -22,7 +22,7 @@ const Page = () => {
       setError(null);
 
       try {
-        const res: any = await adminService.getAllPatients();
+        const res = await adminService.getAllPatients();
         setPatients(res.data?.patients || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load patients data");

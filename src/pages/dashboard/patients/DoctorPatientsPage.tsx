@@ -51,10 +51,11 @@ const DoctorPatientsPage: React.FC = () => {
     try {
       const response = await doctorService.getMyPatients(1, 50);
       setPatients(response.data.patients || []);
+      toast.success('Patients loaded successfully', { id: 'patients-loaded' });
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "Failed to load patients"
-      );
+      const errorMessage = error instanceof Error ? error.message : "Failed to load patients";
+      toast.error(errorMessage, { id: 'patients-error' });
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -67,7 +68,7 @@ const DoctorPatientsPage: React.FC = () => {
 
   const handleAddRecord = (patient: Patient) => {
     setSelectedPatient(patient);
-    setRecordData({ disease: "", diagnosis: "", treatment: "" });
+    setRecordData({ disease: "", diagnosis: "", treatment: "", billingAmount: 0 });
     setIsAddRecordOpen(true);
   };
 
@@ -89,19 +90,22 @@ const DoctorPatientsPage: React.FC = () => {
     try {
       if (isEditRecordOpen && editingRecordIndex !== null) {
         // Update existing record
-        await updateRecord(selectedPatient._id, editingRecordIndex, recordData); // Update record API
+        await updateRecord(selectedPatient._id, editingRecordIndex, recordData);
+        toast.success('Medical record updated successfully!', { id: 'record-updated' });
       } else {
         // Add new record
         await addRecord(selectedPatient._id, recordData);
+        toast.success('Medical record added successfully!', { id: 'record-added' });
       }
 
       setIsAddRecordOpen(false);
       setIsEditRecordOpen(false);
-      setRecordData({ disease: "", diagnosis: "", treatment: "" });
+      setRecordData({ disease: "", diagnosis: "", treatment: "", billingAmount: 0 });
       setEditingRecordIndex(null);
       loadPatients(); // Refresh to get updated patient data
     } catch (error) {
-      // Error handled by useApi hook
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save medical record';
+      toast.error(errorMessage, { id: 'record-error' });
     }
   };
 
@@ -121,10 +125,10 @@ const DoctorPatientsPage: React.FC = () => {
       loadPatients();
 
       // Success toast
-      toast.success("Billing amount updated successfully");
+      toast.success("Billing amount updated successfully", { id: 'billing-updated' });
     } catch (error) {
-      // Error toast
-      toast.error("Failed to update billing amount");
+      const errorMessage = error instanceof Error ? error.message : "Failed to update billing amount";
+      toast.error(errorMessage, { id: 'billing-error' });
     }
   };
 
