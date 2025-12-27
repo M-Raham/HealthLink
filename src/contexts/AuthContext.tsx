@@ -65,6 +65,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = (): void => {
     setUser(null);
     authService.logout();
+    // Clear any remaining authentication state immediately
+    window.localStorage.removeItem('token');
+    window.localStorage.removeItem('user');
   };
 
   const refreshProfile = async (): Promise<void> => {

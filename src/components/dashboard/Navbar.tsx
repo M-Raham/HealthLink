@@ -10,6 +10,8 @@ const Navbar = ({ onMenuClick }: NavbarProps) => {
 
   const handleLogout = () => {
     logout();
+    // Navigate immediately to prevent any flash of login page
+    window.location.href = "/";
   };
 
   return (

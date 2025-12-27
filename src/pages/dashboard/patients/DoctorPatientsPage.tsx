@@ -51,7 +51,6 @@ const DoctorPatientsPage: React.FC = () => {
     try {
       const response = await doctorService.getMyPatients(1, 50);
       setPatients(response.data.patients || []);
-      toast.success('Patients loaded successfully', { id: 'patients-loaded' });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to load patients";
       toast.error(errorMessage, { id: 'patients-error' });

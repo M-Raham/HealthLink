@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Layout from "./layouts/layout";
 import Home from "@pages/landing/Home";
 import About from "@pages/landing/About";
@@ -37,7 +37,26 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!isAuthenticated) {
-    return <Login />;
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Public Route wrapper that redirects authenticated users away from auth pages
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
@@ -50,87 +69,114 @@ const AppRoutes = () => {
       <Route
         path="/"
         element={
-          <Layout>
-            <Home />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <Home />
+            </Layout>
+          </PublicRoute>
         }
       />
       <Route
         path="/about"
         element={
-          <Layout>
-            <About />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <About />
+            </Layout>
+          </PublicRoute>
         }
       />
       <Route
         path="/services"
         element={
-          <Layout>
-            <Services />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <Services />
+            </Layout>
+          </PublicRoute>
         }
       />
       <Route
         path="/appointment"
         element={
-          <Layout>
-            <AppointmentBookingForm />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <AppointmentBookingForm />
+            </Layout>
+          </PublicRoute>
         }
       />
       {/* Service Details */}
       <Route
         path="/services/cardiology"
         element={
-          <Layout>
-            <Cardiology />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <Cardiology />
+            </Layout>
+          </PublicRoute>
         }
       />
       <Route
         path="/services/neurology"
         element={
-          <Layout>
-            <Neurology />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <Neurology />
+            </Layout>
+          </PublicRoute>
         }
       />
       <Route
         path="/services/orthopedics"
         element={
-          <Layout>
-            <Orthopedics />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <Orthopedics />
+            </Layout>
+          </PublicRoute>
         }
       />
       <Route
         path="/services/pediatrics"
         element={
-          <Layout>
-            <Pediatrics />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <Pediatrics />
+            </Layout>
+          </PublicRoute>
         }
       />
       <Route
         path="/services/oncology"
         element={
-          <Layout>
-            <Oncology />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <Oncology />
+            </Layout>
+          </PublicRoute>
         }
       />
       <Route
         path="/services/diagnostics"
         element={
-          <Layout>
-            <Diagnostics />
-          </Layout>
+          <PublicRoute>
+            <Layout>
+              <Diagnostics />
+            </Layout>
+          </PublicRoute>
         }
       />
 
       {/* Auth Pages */}
-      <Route path="/login" element={<Login />} />
+      <Route 
+        path="/login" 
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        } 
+      />
 
       {/* Dashboard (Protected) */}
       <Route

@@ -9,7 +9,7 @@ import {
   Stethoscope,
   User,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/useAuth";
 
 interface SidebarProps {
@@ -19,9 +19,12 @@ interface SidebarProps {
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const { user, logout, isAdmin, isDoctor } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
+    // Use replace to prevent back button from returning to dashboard
+    navigate("/", { replace: true });
     onClose(); // close sidebar on mobile
   };
 
