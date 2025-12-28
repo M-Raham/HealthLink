@@ -17,14 +17,17 @@ connectDB().then(() => {
   createDefaultAdmin();
 });
 
-app.use(helmet());
+const allowedOrigins =
+  process.env.NODE_ENV === 'production'
+    ? ['https://your-frontend-domain.com']
+    : ['http://localhost:3000', 'http://localhost:5173'];
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.com'] 
-    : ['http://localhost:3000', 'http://localhost:5173'],
+  origin: allowedOrigins,
   credentials: true
 }));
 
+app.use(helmet());
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -39,10 +42,8 @@ const server = app.listen(PORT, () => {
 });
 
 process.on('unhandledRejection', (err: Error) => {
-  console.log('❌ Unhandled Rejection:', err.message);
-  server.close(() => {
-    process.exit(1);
-  });
+  console.error('❌ Unhandled Rejection:', err.message);
+  server.close(() => process.exit(1));
 });
 
 process.on('SIGTERM', () => {
